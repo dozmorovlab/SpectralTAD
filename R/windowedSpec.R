@@ -7,30 +7,48 @@ windowedSpec = function(cont_mat, resolution, chr,
   require(cluster)
   source("GroupsFix2.R")
 
+  #Set window sized based on biologically maximum TAD size of 2000000
+
   window_size = ceiling(2000000/resolution)
+
+  #Find all regions which aren't completely zero and remove those that are
 
   non_gaps = which(colSums(cont_mat) !=0)
 
   cont_mat = cont_mat[non_gaps,non_gaps]
 
-  max_end = ceiling(2000000/resolution)
-  max_size = window_size/ceiling(200000/resolution)
-  min_size = ceiling(200000/resolution)
+  #Get end point of the first window
+
   Group_over = bind_rows()
 
+  #Initialize first window
+
   start = 1
-  end = max_end
+  end = window_size
+
+  #Set parameter for determining end of loop
 
   end_loop = 0
+
+  #Test if start+window is larger than the contact matrix and correct end point
 
   if (end+window_size>nrow(cont_mat)) {
     end = nrow(cont_mat)
   }
 
+  #Begin sliding window clustering
+
     while (end_loop == 0) {
+
+    #Subset matrix based on window size
+
     sub_filt = cont_mat[start:end, start:end]
 
+    #Calculate distance matrix for silhouette score
+
     dist_sub = 1/(1+sub_filt)
+
+    #Get degree matrix
 
     dr = rowSums(abs(sub_filt))
 
@@ -41,21 +59,9 @@ windowedSpec = function(cont_mat, resolution, chr,
     P_Part1 = crossprod(as.matrix(sub_filt), Dinvsqrt)
     sub_mat = crossprod(Dinvsqrt, P_Part1)
 
-    #sub_mat = crossprod(diag(dr^-(1/2)), as.matrix(sub_filt))
-
     colnames(sub_mat) = colnames(cont_mat)[start:end]
 
-    #Find gaps at 2mb and remove
-
-
-    #Remove gaps if true
-
-    # if (length(sub_gaps) != 0) {
-    #   sub_mat = sub_mat[!sub_gaps, !sub_gaps]
-    # }
-
-
-    #Get first two eigenvectors
+    #Get first k eigenvectors
 
     Eigen = eigs_sym(sub_mat, NEig = eigenvalues)
 
@@ -72,11 +78,11 @@ windowedSpec = function(cont_mat, resolution, chr,
     index = 1
     Group_mem = list()
 
-    #When wide search is on we have an extra step that does a preliminary search for the best starting point
+    #Calculate the range of possible clusters
 
     clusters = 1:ceiling( (end-start+1)/min_size)
 
-    #Normalize the eigenvectors
+    #Normalize the eigenvectors from 0-1
 
     norm_ones = sqrt(dim(sub_mat)[2])
 
@@ -86,9 +92,6 @@ windowedSpec = function(cont_mat, resolution, chr,
         eig_vecs[,i] = -1*eig_vecs[,i] * sign(eig_vecs[1,i])
       }
     }
-
-
-    eps = 2.2204e-16
 
     n = dim(eig_vecs)[1]
     k = dim(eig_vecs)[2]
@@ -100,20 +103,9 @@ windowedSpec = function(cont_mat, resolution, chr,
 
     #Get distance between points on circle
 
-
     point_dist = sqrt(rowSums( (eig_vecs-rbind(NA,eig_vecs[-nrow(eig_vecs),]))^2  ))
 
-    #Only consider points with z-scores higher than 2
-
-    # if (strict ) {
-    #
-    #   if (sum(scale(point_dist)>2, na.rm = TRUE) == 0 ) {
-    #   Group_over = bind_rows()
-    #   end_loop = 1
-    #   break
-    #   }
-    #
-    # }
+    #Use z-score to select significant gaps
 
     if (z_clust) {
 
@@ -121,20 +113,21 @@ windowedSpec = function(cont_mat, resolution, chr,
 
       sig_bounds = which(scale(point_dist[-length(point_dist)])>2)
 
-      #Remove boundaries before 5 or within 5 of others
+      #Remove boundaries within the minimum size
 
-      sig_bounds = subset(sig_bounds, sig_bounds>5)
+      sig_bounds = subset(sig_bounds, sig_bounds>min_Size)
 
-      #10 is to offset and remove the second occurence
+      #2*min_size is to offset and remove the second occurence
 
-      dist_bounds = which(c(10,diff(sig_bounds))<5)
+      dist_bounds = which(c(min_size*2,diff(sig_bounds))<min_size)
 
+      #Remove bounds within the mininum size if they exist
 
       if (length(dist_bounds) > 0) {
       sig_bounds = sig_bounds[-dist_bounds]
       }
 
-      #Create TADs
+      #Create TADs using significant boundaries
 
       TAD_start = c(1, sig_bounds+1)
 
@@ -148,12 +141,18 @@ windowedSpec = function(cont_mat, resolution, chr,
 
       if (length(sig_bounds) == 0) {
 
+        #Create empty set if non-significant
+
         end_group = bind_rows()
       } else {
-      end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = memberships)
 
+        #Assign IDs based on coordinate and groups based on significant boundaries
 
-      end_group = end_group %>% dplyr::mutate(group_place = Group) %>% dplyr::group_by(group_place) %>% dplyr::mutate(Group = last(ID)) %>% dplyr::ungroup() %>% dplyr::select(ID, Group)
+        end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = memberships)
+
+        #Compile into bed file
+
+        end_group = end_group %>% dplyr::mutate(group_place = Group) %>% dplyr::group_by(group_place) %>% dplyr::mutate(Group = last(ID)) %>% dplyr::ungroup() %>% dplyr::select(ID, Group)
 
       }
 
@@ -164,9 +163,11 @@ windowedSpec = function(cont_mat, resolution, chr,
 
     gap_order = order(-point_dist)
 
-    #Remove boundaries occuring before 200kb
+    #Remove boundaries occuring before minimum size at the very beginning of window
 
-    gap_order = gap_order[-which(gap_order<5)]
+    gap_order = gap_order[-which(gap_order<min_size)]
+
+    #Initialize silhouette score
 
     sil_score = c()
 
@@ -182,6 +183,8 @@ windowedSpec = function(cont_mat, resolution, chr,
       first_run = TRUE
       cutpoints = c()
 
+      #Loop through cluster numbers by iteratively adding new candidate boundaries and testing
+
       while(partition_found == 0) {
 
         #Get candidate gaps
@@ -190,13 +193,17 @@ windowedSpec = function(cont_mat, resolution, chr,
 
         cutpoints = c(cutpoints, new_gap)
 
+        #Identify gaps which are closer together than the minimum TAD size
+
         diff_points = which( abs(new_gap-cutpoints[-length(cutpoints)]) <= min_size)
 
-        #Remove the point
+        #If a point exists that is too close to another, remove it
 
         if (length(diff_points)>0) {
           cutpoints = cutpoints[-length(cutpoints)]
         }
+
+        #If not these are final clusters
 
         if (length(cutpoints) == cluster) {
           partition_found = 1
@@ -205,71 +212,91 @@ windowedSpec = function(cont_mat, resolution, chr,
         }
       }
 
+      #If the new candidate cluster is an NA value, ignore
+
       if (any(is.na(cutpoints))) {
         next
       }
 
       #Order
 
-
       cutpoints = cutpoints[order(cutpoints)]
+
+      #Combine cutpoints with start and end of window
+
       cutpoints = c(1, cutpoints, (end-start)+2)
 
-      #Add 1 to final cutpoint to account for offset
-
-      #Find size of groups
+      #Find size of each cluster (TAD)
 
       group_size = diff(cutpoints)
 
-      #Add start and end
+      #Assign locations of the window memberships based on cutpoints
 
       memberships = c()
       for (i in 1:length(group_size)) {
         memberships = c(memberships, rep(i,times = group_size[i]))
       }
 
-      #Get silhouette score
+      #Get silhouette score for current number of clusters (TADs)
+
       sil = summary(silhouette(memberships,dist_sub))
 
+      #Save silhouette scores for each configuration in vector
+
       sil_score = c(sil_score, sil$si.summary[4])
+
+      #Save memberships in list
 
       Group_mem[[cluster]] = memberships
 
     }
 
-    #Get all IDs in the last group
-
-
+    #Pull out the cutpoints which maximize silhouette score
 
     end_group = Group_mem[[which.max(sil_score)]]
 
+    #Put coordinates and group IDs into data frame
+
     end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = end_group)
 
+    #Convert IDs to coordinates of endpoint to avoid overlaps
 
     end_group = end_group %>%dplyr::mutate(group_place = Group) %>%dplyr::group_by(group_place) %>%dplyr::mutate(Group = max(ID)) %>% ungroup() %>% dplyr::select(ID, Group)
 
     }
+
+    #End while loop if window reaches end of contact matrix
 
     if (end == nrow(cont_mat)) {
       Group_over = bind_rows(Group_over, end_group)
       end_loop = 1
     } else {
 
-      #Remove the last group and set new start to start of group
+      #Remove the last group (To account for overlap across windows) and set new start to start of group
 
       end_IDs = which(end_group$Group == last(end_group$Group))
 
-
       start = end-length(end_IDs)+1
+
+      #Account for cases when final TAD can't be removed
 
       if (length(start) == 0 ) {
         start = end
       }
 
-      end = start+max_end
+      #Set new window end
+
+      end = start+window_size
+
+      #Remove final group to avoid repeating
 
       end_group = end_group[-end_IDs, ]
+
+      #Combine TAD coordinates into single bed file
+
       Group_over = bind_rows(Group_over, end_group)
+
+      #Set end point to end of contact matrix if window is larger than end of matrix
 
       if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
         end = nrow(cont_mat)
@@ -278,6 +305,8 @@ windowedSpec = function(cont_mat, resolution, chr,
     }
     }
 
+
+  #Organize final results based on options selected
 
   if (z_clust) {
 
@@ -291,11 +320,15 @@ windowedSpec = function(cont_mat, resolution, chr,
 
   if (qual_filter) {
 
+    #Calculate an overall distance matrix for calculating silhouette score for filtering
+
     over_dist_mat = 1/(1+cont_mat)
 
     sil = silhouette(Group_over$Group, over_dist_mat)
 
     ave_sil = summary(sil)$clus.avg.widths
+
+    #Subset results based on silhouette score depending on qual_filter option
 
     bed = Group_over %>%dplyr::group_by(Group) %>%dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>%dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%
      dplyr::mutate(Sil_Score = ave_sil) %>%dplyr::filter( ((end-start)/resolution >= min_size) & Sil_Score > .15)  %>%dplyr::arrange(start)
