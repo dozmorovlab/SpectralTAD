@@ -1,12 +1,6 @@
 windowedSpec = function(cont_mat, resolution, chr,
                         gap_filter = TRUE,z_clust = FALSE,  qual_filter = TRUE, eigenvalues = 2, min_size = 5) {
 
-  require(PRIMME)
-  require(Matrix)
-  require(dplyr)
-  require(cluster)
-  source("GroupsFix2.R")
-
   #Set window sized based on biologically maximum TAD size of 2000000
 
   window_size = ceiling(2000000/resolution)
@@ -19,7 +13,7 @@ windowedSpec = function(cont_mat, resolution, chr,
 
   #Get end point of the first window
 
-  Group_over = bind_rows()
+  Group_over = dplyr::bind_rows()
 
   #Initialize first window
 
@@ -56,14 +50,14 @@ windowedSpec = function(cont_mat, resolution, chr,
 
     Dinvsqrt = diag((1/sqrt(dr+2e-16)))
 
-    P_Part1 = crossprod(as.matrix(sub_filt), Dinvsqrt)
-    sub_mat = crossprod(Dinvsqrt, P_Part1)
+    P_Part1 = Matrix::crossprod(as.matrix(sub_filt), Dinvsqrt)
+    sub_mat = Matrix::crossprod(Dinvsqrt, P_Part1)
 
     colnames(sub_mat) = colnames(cont_mat)[start:end]
 
     #Get first k eigenvectors
 
-    Eigen = eigs_sym(sub_mat, NEig = eigenvalues)
+    Eigen = PRIMME::eigs_sym(sub_mat, NEig = eigenvalues)
 
     eig_vals = Eigen$values
     eig_vecs = Eigen$vectors
@@ -143,7 +137,7 @@ windowedSpec = function(cont_mat, resolution, chr,
 
         #Create empty set if non-significant
 
-        end_group = bind_rows()
+        end_group = dplyr::bind_rows()
       } else {
 
         #Assign IDs based on coordinate and groups based on significant boundaries
@@ -239,7 +233,7 @@ windowedSpec = function(cont_mat, resolution, chr,
 
       #Get silhouette score for current number of clusters (TADs)
 
-      sil = summary(silhouette(memberships,dist_sub))
+      sil = summary(cluster::silhouette(memberships,dist_sub))
 
       #Save silhouette scores for each configuration in vector
 
@@ -268,7 +262,7 @@ windowedSpec = function(cont_mat, resolution, chr,
     #End while loop if window reaches end of contact matrix
 
     if (end == nrow(cont_mat)) {
-      Group_over = bind_rows(Group_over, end_group)
+      Group_over = dplyr::bind_rows(Group_over, end_group)
       end_loop = 1
     } else {
 
@@ -294,7 +288,7 @@ windowedSpec = function(cont_mat, resolution, chr,
 
       #Combine TAD coordinates into single bed file
 
-      Group_over = bind_rows(Group_over, end_group)
+      Group_over = dplyr::bind_rows(Group_over, end_group)
 
       #Set end point to end of contact matrix if window is larger than end of matrix
 
@@ -324,16 +318,16 @@ windowedSpec = function(cont_mat, resolution, chr,
 
     over_dist_mat = 1/(1+cont_mat)
 
-    sil = silhouette(Group_over$Group, over_dist_mat)
+    sil = cluster::silhouette(Group_over$Group, over_dist_mat)
 
     ave_sil = summary(sil)$clus.avg.widths
 
     #Subset results based on silhouette score depending on qual_filter option
 
-    bed = Group_over %>%dplyr::group_by(Group) %>%dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>%dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%
+    bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>% dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%
      dplyr::mutate(Sil_Score = ave_sil) %>%dplyr::filter( ((end-start)/resolution >= min_size) & Sil_Score > .15)  %>%dplyr::arrange(start)
   } else {
-    bed = Group_over %>%dplyr::group_by(Group) %>%dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>%dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%dplyr::filter((end-start)/resolution >= min_size) %>%dplyr::arrange(start)
+    bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>% dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%dplyr::filter((end-start)/resolution >= min_size) %>% dplyr::arrange(start)
   }
   }
 
