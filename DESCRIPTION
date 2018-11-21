@@ -15,4 +15,7 @@ Imports:
     dplyr,
     PRIMME,
     cluster,
-    Matrix
+    Matrix,
+    parallel,
+    BiocParallel,
+    magrittr

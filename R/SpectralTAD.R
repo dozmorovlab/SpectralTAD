@@ -1,5 +1,6 @@
 #' Hierarchical Spectral Clustering of TADs
 #'
+#' @import dplyr
 #' @param cont_mat Contact matrix in either sparse 3 column, n x n or n x (n+3) form where the first 3 columns are a bed file of coordinates. If a n x n matrix is used, the column names must correspond to the start point of the corresponding bin. Required.
 #' @param chr The chromosome of the contact matrix being analyzed. Required.
 #' @param levels The number of levels of the TAD hierarchy to be calculated, The default setting is 1.
@@ -9,9 +10,9 @@
 #' @param min_size The minimum allowable TAD size measured in bins. Defaults to 5.
 #' @param resolution The resolution of the contact matrix. If none selected the resolution is estimated by taking the difference in start points between the first and second bin. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.
 #' @export
-#' @details Given a sparse 3 column, an n x n contact matrix or n x (n+3) contact matrix, hierarchicalSpec returns a list of TAD coordinates in bed form. SpectralTAD works by using a sliding window that moves along the diagonal of the contact matrix. By default we use the biologically relevant maximum TAD size of 2mb and minimum size of 5 bins to determine the of this window. Within each window we calculate a Laplacian matrix and determine the location of TAD boundaries based on gaps between eigenvectors calculated from this matrix. The number of TADs in a given window is calculated by finding the number that maximize the silhouette score. A hierarchy of TADs is created by iteratively applying the function to sub-TADs. The number of levels in each hierarchy is determined by the user.
+#' @details Given a sparse 3 column, an n x n contact matrix or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates in bed form. SpectralTAD works by using a sliding window that moves along the diagonal of the contact matrix. By default we use the biologically relevant maximum TAD size of 2mb and minimum size of 5 bins to determine the of this window. Within each window we calculate a Laplacian matrix and determine the location of TAD boundaries based on gaps between eigenvectors calculated from this matrix. The number of TADs in a given window is calculated by finding the number that maximize the silhouette score. A hierarchy of TADs is created by iteratively applying the function to sub-TADs. The number of levels in each hierarchy is determined by the user.
 
-hierarchicalSpec = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size =5, resolution = "auto") {
+SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size =5, resolution = "auto") {
 
   #Calculate the number of rows and columns of the contact matrix
 
@@ -137,7 +138,7 @@ hierarchicalSpec = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clu
 
 
 #Function to perform the actual sliding window Spectral clustering
-#Used within hierarchicalSpec
+#Used within SpectralTAD
 
 .windowedSpec = function(cont_mat, resolution, chr,
                         gap_filter = TRUE,z_clust = FALSE,  qual_filter = TRUE, eigenvalues = 2, min_size = 5) {
