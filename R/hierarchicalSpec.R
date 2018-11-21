@@ -11,7 +11,7 @@
 #' @param resolution The resolution of the contact matrix. If none selected the resolution is estimated by taking the difference in endpoints between the first and second bin.
 #' @keywords spectral clustering
 #' @export
-#' @examples
+#' @details
 #' hierarchicalSpec()
 
 hierarchicalSpec = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size =5, resolution = "auto") {
