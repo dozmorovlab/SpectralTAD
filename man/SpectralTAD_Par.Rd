@@ -25,6 +25,8 @@ SpectralTAD_Par(cont_list, chr_over, labels = NULL, levels = 1,
 
 \item{min_size}{The minimum allowable TAD size measured in bins. Defaults to 5.}
 
+\item{cores}{Number of cores to use. Defaults to total available cores minus one}
+
 \item{resolution}{The resolution of the contact matrices. If none selected, the resolution is estimated by taking the difference in start points between the first and second bin. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.}
 }
 \description{

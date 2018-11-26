@@ -10,6 +10,7 @@
 #' @param eigenvalues The number of eigenvectors to be calculated. The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Defaults to 5.
 #' @param resolution The resolution of the contact matrices. If none selected, the resolution is estimated by taking the difference in start points between the first and second bin. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.
+#' @param cores Number of cores to use. Defaults to total available cores minus one
 #' @export
 #' @details Given a list of sparse 3 column, n x n or n x (n+3) contact matrices, SpectralTAD_Par returns a list of TAD coordinates in bed form. SpectralTAD works by using a sliding window that moves along the diagonal of the contact matrix. By default we use the biologically relevant maximum TAD size of 2mb and minimum size of 5 bins to determine the of this window. Within each window we calculate a Laplacian matrix and determine the location of TAD boundaries based on gaps between eigenvectors calculated from this matrix. The number of TADs in a given window is calculated by finding the number that maximize the silhouette score. A hierarchy of TADs is created by iteratively applying the function to sub-TADs. The number of levels in each hierarchy is determined by the user. This is the parallelized version of SpectralTAD.
 

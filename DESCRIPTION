@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "first.last@example.com")
 Description: What the package does (one paragraph).
-License: What license it uses
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.0
@@ -18,4 +18,5 @@ Imports:
     Matrix,
     parallel,
     BiocParallel,
-    magrittr
+    magrittr,
+    HiCcompare
