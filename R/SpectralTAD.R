@@ -251,7 +251,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
       #Remove boundaries within the minimum size
 
-      sig_bounds = subset(sig_bounds, sig_bounds>min_Size)
+      sig_bounds = subset(sig_bounds, sig_bounds>min_size)
 
       #2*min_size is to offset and remove the second occurence
 
