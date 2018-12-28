@@ -63,7 +63,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   #Performed window spectral clustering
 
-  bed = .windowedSpec(cont_mat, chr = chr, resolution = resolution, z_clust = FALSE, eigenvalues = eigenvalues, min_size = min_size, qual_filter = qual_filter) %>% mutate(Level = 1)
+  bed = .windowedSpec(cont_mat, chr = chr, resolution = resolution, z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size, qual_filter = qual_filter) %>% mutate(Level = 1)
 
   #Calculate the end point of TADs based on bin instead of genomic coordinate
 
@@ -102,6 +102,12 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     pres_tads = c()
   }
 
+  #Account for the situation where there is only 1 potential sub-tad
+
+  if (is.na(nrow(coords))) {
+    coords = t(as.matrix(coords))
+  }
+
   tads = apply(coords, 1, function(x) cont_mat[x[1]:x[2], x[1]:x[2]])
 
   #Remove sub-tads with too many zeros
@@ -116,7 +122,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
   #Calculate sub-TADs for each seperable TAD
 
   sub_tads = lapply(tads, function(x) {
-    .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = z_clust, min_size = min_size)
+    .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = FALSE, min_size = min_size)
     })
 
   #Create a bed file for sub-TADs
