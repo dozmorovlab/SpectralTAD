@@ -104,7 +104,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   #Account for the situation where there is only 1 potential sub-tad
 
-  if (is.na(nrow(coords))) {
+  if (is.null(nrow(coords))) {
     coords = t(as.matrix(coords))
   }
 
