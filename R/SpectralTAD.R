@@ -16,6 +16,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   #Calculate the number of rows and columns of the contact matrix
 
+  if (all(is.finite(cont_mat)) == FALSE) {
+    stop("Contact matrix must only contain real numbers")
+  }
+
+  if (missing("chr")) {
+    stop("Must specify chromosome")
+  }
+
   row_test = dim(cont_mat)[1]
   col_test = dim(cont_mat)[2]
 
@@ -186,6 +194,9 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
     sub_filt = cont_mat[start:end, start:end]
 
+    # sub_gaps = colSums(sub_filt)>0
+    # sub_filt = sub_filt[sub_gaps, sub_gaps]
+
     #Calculate distance matrix for silhouette score
 
     dist_sub = 1/(1+sub_filt)
@@ -196,12 +207,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
     #Creating the normalized laplacian
 
-    Dinvsqrt = diag((1/sqrt(dr+2e-16)))
+    Dinvsqrt = diag((1/sqrt(dr)))
 
     P_Part1 = Matrix::crossprod(as.matrix(sub_filt), Dinvsqrt)
     sub_mat = Matrix::crossprod(Dinvsqrt, P_Part1)
 
     colnames(sub_mat) = colnames(cont_mat)[start:end]
+
+    sub_mat[is.nan(sub_mat)] = 0
 
     #Get first k eigenvectors
 
@@ -288,6 +301,16 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
         end_group = dplyr::bind_rows()
       } else {
 
+        sig_bounds = which(scale(point_dist[-length(point_dist)])>2)
+
+        #Remove boundaries within the minimum size
+
+        sig_bounds = subset(sig_bounds, sig_bounds>min_size)
+
+        #2*min_size is to offset and remove the second occurence
+
+        dist_bounds = which(c(min_size*2,diff(sig_bounds))<min_size)
+
         #Assign IDs based on coordinate and groups based on significant boundaries
 
         end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = memberships)
@@ -301,13 +324,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
     } else {
 
+
       #Find largest gaps
 
       gap_order = order(-point_dist)
 
       #Remove boundaries occuring before minimum size at the very beginning of window
 
-      gap_order = gap_order[-which(gap_order<min_size)]
+      #gap_order = gap_order[-which(gap_order<min_size)]
 
       #Initialize silhouette score
 
@@ -393,9 +417,11 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
       }
 
+
+
       #Pull out the cutpoints which maximize silhouette score
 
-      end_group = Group_mem[[which.max(sil_score)]]
+      end_group = Group_mem[[which(diff(sil_score)<0)[1]]]
 
       #Put coordinates and group IDs into data frame
 
