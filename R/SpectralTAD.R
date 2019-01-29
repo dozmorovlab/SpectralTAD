@@ -12,7 +12,7 @@
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates in bed form. SpectralTAD works by using a sliding window that moves along the diagonal of the contact matrix. By default we use the biologically relevant maximum TAD size of 2mb and minimum size of 5 bins to determine the of this window. Within each window we calculate a Laplacian matrix and determine the location of TAD boundaries based on gaps between eigenvectors calculated from this matrix. The number of TADs in a given window is calculated by finding the number that maximize the silhouette score. A hierarchy of TADs is created by iteratively applying the function to sub-TADs. The number of levels in each hierarchy is determined by the user.
 
-SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size = 5, resolution = "auto") {
+SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size = 5, resolution = "auto", gap_threshold = 1) {
 
   #Calculate the number of rows and columns of the contact matrix
 
@@ -66,11 +66,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
     stop("Contact matrix must be sparse or n x n or n x (n+3)!")
     break
-  }
-
-  #Estimate resolution of n x n matrix
-
-  else if ( (resolution == "auto") & (col_test-row_test == 0) ) {
+  } else if ( (resolution == "auto") & (col_test-row_test == 0) ) {
       message("Estimating resolution")
 
       #Estimating resolution based on most common distance between loci
@@ -80,7 +76,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   #Performed window spectral clustering
 
-  bed = .windowedSpec(cont_mat, chr = chr, resolution = resolution, z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size, qual_filter = qual_filter) %>% mutate(Level = 1)
+  bed = .windowedSpec(cont_mat, chr = chr, resolution = resolution, z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size, qual_filter = qual_filter, gap_threshold = gap_threshold) %>% mutate(Level = 1)
 
   #Calculate the end point of TADs based on bin instead of genomic coordinate
 
@@ -127,6 +123,8 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   tads = apply(coords, 1, function(x) cont_mat[x[1]:x[2], x[1]:x[2]])
 
+
+
   #Remove sub-tads with too many zeros
 
   zeros = which(unlist(lapply(tads, function(x) nrow(x)-sum(rowSums(x)==0)))<min_size*2)
@@ -164,7 +162,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 #Used within SpectralTAD
 
 .windowedSpec = function(cont_mat, resolution, chr,
-                        gap_filter = TRUE,z_clust = FALSE,  qual_filter = TRUE, eigenvalues = 2, min_size = 5) {
+                        gap_filter = TRUE,z_clust = FALSE,  qual_filter = TRUE, eigenvalues = 2, min_size = 5, gap_threshold = 1) {
 
   #Set window sized based on biologically maximum TAD size of 2000000
 
@@ -172,9 +170,6 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   #Find all regions which aren't completely zero and remove those that are
 
-  non_gaps = which(colSums(cont_mat) !=0)
-
-  cont_mat = cont_mat[non_gaps,non_gaps]
 
   #Get end point of the first window
 
@@ -203,6 +198,17 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
     sub_filt = cont_mat[start:end, start:end]
 
+    zero_thresh = round(nrow(sub_filt)*(gap_threshold))
+    non_gaps_within = which((colSums(sub_filt == 0))<zero_thresh)
+
+    sub_filt = sub_filt[non_gaps_within, non_gaps_within]
+
+    if (nrow(sub_filt) < min_size*2) {
+      start = end
+      end = start+window_size
+      next
+    }
+
     # sub_gaps = colSums(sub_filt)>0
     # sub_filt = sub_filt[sub_gaps, sub_gaps]
 
@@ -221,7 +227,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     P_Part1 = Matrix::crossprod(as.matrix(sub_filt), Dinvsqrt)
     sub_mat = Matrix::crossprod(Dinvsqrt, P_Part1)
 
-    colnames(sub_mat) = colnames(cont_mat)[start:end]
+    colnames(sub_mat) = colnames(cont_mat)[non_gaps_within]
 
     sub_mat[is.nan(sub_mat)] = 0
 
@@ -399,7 +405,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
         #Combine cutpoints with start and end of window
 
-        cutpoints = c(1, cutpoints, (end-start)+2)
+        cutpoints = c(1, cutpoints, length(non_gaps_within)+1)
 
         #Find size of each cluster (TAD)
 
@@ -499,7 +505,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
       #Calculate an overall distance matrix for calculating silhouette score for filtering
 
-      over_dist_mat = 1/(1+cont_mat)
+      #Get range of values in the contact matrix
+
+      fin_range = match(Group_over$ID,colnames(cont_mat))
+
+      over_dist_mat = 1/(1+cont_mat[fin_range, fin_range])
+
+
+      #Calculate group-wise silhouette
 
       sil = cluster::silhouette(Group_over$Group, over_dist_mat)
 
@@ -508,7 +521,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
       #Subset results based on silhouette score depending on qual_filter option
 
       bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>% dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%
-        dplyr::mutate(Sil_Score = ave_sil) %>%dplyr::filter( ((end-start)/resolution >= min_size) & Sil_Score > .15)  %>%dplyr::arrange(start)
+        dplyr::mutate(Sil_Score = ave_sil) %>% dplyr::filter( ((end-start)/resolution >= min_size) & Sil_Score > .15)  %>%dplyr::arrange(start)
     } else {
       bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>% dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%dplyr::filter((end-start)/resolution >= min_size) %>% dplyr::arrange(start)
     }

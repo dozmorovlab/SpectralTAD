@@ -6,7 +6,7 @@
 \usage{
 SpectralTAD(cont_mat, chr, levels = 1, qual_filter = TRUE,
   z_clust = FALSE, eigenvalues = 2, min_size = 5,
-  resolution = "auto")
+  resolution = "auto", gap_threshold = 1)
 }
 \arguments{
 \item{cont_mat}{Contact matrix in either sparse 3 column, n x n or n x (n+3) form where the first 3 columns are a bed file of coordinates. If a n x n matrix is used, the column names must correspond to the start point of the corresponding bin. Required.}
