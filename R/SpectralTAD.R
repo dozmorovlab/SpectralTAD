@@ -8,11 +8,11 @@
 #' @param z_clust Option to filter sub-TADs based on the z-score of their eigenvector gaps. The default setting is FALSE.
 #' @param eigenvalues The number of eigenvectors to be calculated. The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Defaults to 5.
-#' @param resolution The resolution of the contact matrix. If none selected the resolution is estimated by taking the difference in start points between the first and second bin. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.
+#' @param resolution The resolution of the contact matrix. If none selected the resolution is estimated by taking the most common distance between bins. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates in bed form. SpectralTAD works by using a sliding window that moves along the diagonal of the contact matrix. By default we use the biologically relevant maximum TAD size of 2mb and minimum size of 5 bins to determine the of this window. Within each window we calculate a Laplacian matrix and determine the location of TAD boundaries based on gaps between eigenvectors calculated from this matrix. The number of TADs in a given window is calculated by finding the number that maximize the silhouette score. A hierarchy of TADs is created by iteratively applying the function to sub-TADs. The number of levels in each hierarchy is determined by the user.
 
-SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size =5, resolution = "auto") {
+SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size = 5, resolution = "auto") {
 
   #Calculate the number of rows and columns of the contact matrix
 
@@ -32,7 +32,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     #Convert sparse matrix to n x n matrix
 
     cont_mat = HiCcompare::sparse2full(cont_mat)
+
     message("Converting to n x n matrix")
+
+    if (resolution == "auto") {
+      message("Estimating resolution")
+      resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-lag(as.numeric(colnames(cont_mat)))))[1])
+    }
+
   } else if (col_test-row_test == 3) {
 
     message("Converting to n x n matrix")
@@ -53,7 +60,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
     colnames(cont_mat) = start_coords
 
-  } else if (col_test!=3 & row_test != col_test & col_test-row_test != 3) {
+  } else if (col_test!=3 & (row_test != col_test) & (col_test-row_test != 3)) {
 
     #Throw error if matrix does not correspond to known matrix type
 
@@ -61,12 +68,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     break
   }
 
-  #Automatically estimate resolution based on distance between first two bin start points
+  #Estimate resolution of n x n matrix
 
-  if (resolution == "auto") {
-    resolution = as.numeric(colnames(cont_mat)[2])-as.numeric(colnames(cont_mat)[1])
-  } else {
-    resolution = resolution
+  else if ( (resolution == "auto") & (col_test-row_test == 0) ) {
+      message("Estimating resolution")
+
+      #Estimating resolution based on most common distance between loci
+
+      resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-lag(as.numeric(colnames(cont_mat)))))[1])
   }
 
   #Performed window spectral clustering
