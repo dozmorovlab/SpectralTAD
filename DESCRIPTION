@@ -20,3 +20,7 @@ Imports:
     BiocParallel,
     magrittr,
     HiCcompare
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

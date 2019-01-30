@@ -1,0 +1,154 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{HiCcompare Usage Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 400)
+```
+
+# Introduction
+
+`SpectralTAD` is a package designed to allow for fast hierarchical TAD calling on a wide-variety of data. `SpectralTAD` takes a contact matrix as an input and outputs a bed file containing coordinates corresponding to TAD locations. The package contains two functions, `SpectralTAD` and `SpectralTAD_Par` with SpectralTAD being a simple TAD-caller and `SpectralTAD_Par` being the parallelized version. This package provides flexibility in the data it accepts, allowing for n x n, n x (n+3) and 3-column sparse matrices. There are no parameters required for running the functions, though certain methods for customizing the results are available. The idea is to give users the freedom to control how they call TADs while giving them the option to perform it in an unsupervised manner.
+
+The package is based around the windowed spectral clustering algorithm, introduced by [@cresswell:2019aa] which is designed to be robust to biases such as sparsity, noise and downsampling. 
+
+# Getting Started
+
+## Installation
+
+```{r, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SpectralTAD")
+library(SpectralTAD)
+```
+
+## Input data
+
+### Working with n x n matrices
+
+n x n contact matrices, are most commonly associated with data coming from the Bing Ren lab (http://chromosome.sdsc.edu/mouse/hi-c/download.html). These contact matrices are square and symmetric with entry ij corresponding to the number of contacts between region i and region j. Below is an example of a 5 x 5 region of an n x n contact matrix. Derived from Rao 2014, chromosome 19 data. Note the symmetry
+
+```{r, echo = FALSE}
+data("rao_chr20_25_rep")
+rao_chr20_25_rep = HiCcompare::sparse2full(rao_chr20_25_rep)
+rao_chr20_25_rep[1:5, 1:5]
+```
+
+### Working with sparse 3-column matrices
+
+Sparse 3-column matrices, sometimes referred to as a coordinated lists, are matrices where the first and second column refer to region i and region j of the chromosome and the third column is the number of contacts between them. This style is becoming increasingly common and is associated with raw data from Rao (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525) and data output by the Juicer tool. 3-column matrices are handled internally in the package by converting them to n x n matrices using the `HiCcompare` package's `sparse2full` function. This may add some runtime for large matrices, when compared with n x n matrices. The first 5 rows of a typical sparse 3-column matrix is shown below.
+
+```{r, echo = FALSE}
+head(HiCcompare::full2sparse(rao_chr20_25_rep), 5)
+```
+
+### Working with n x (n+3) matrices
+
+n x (n+3) matrices are commonly associated with the TopDom tad-caller (http://zhoulab.usc.edu/TopDom/). These matrices consist of a normal n x n matrix but with 3 additional leading columns containg the chromosome, the start of the region and the end of the region. Regions in this case are determined by the resolution of the data. The typical n x (n+3) matrix is shown below.
+
+```{r, echo = FALSE}
+row.names(rao_chr20_25_rep) = NULL
+sub_mat = cbind.data.frame("chr19", as.numeric(colnames(rao_chr20_25_rep)), as.numeric(colnames(rao_chr20_25_rep))+25000, rao_chr20_25_rep)[1:10, 1:10]
+colnames(sub_mat) = NULL
+
+sub_mat
+```
+
+### Working with ther data types
+
+Users can also find TADs from data outputted by `cooler` (http://cooler.readthedocs.io/en/latest/index.html) and HiC-Pro (https://github.com/nservant/HiC-Pro) with minor pre-processing using the `HiCcompare` package. 
+
+#### Working with .cool files
+
+We can pre-process and use .cool files using the following steps:
+
+1. Download `.cool` file from (ftp://cooler.csail.mit.edu/coolers)
+2. Convert to text file using `cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool > Rao.GM12878.50kb.txt
+3. Run the code below
+
+```{r, eval = FALSE}
+#Read in data
+cool_mat = read.table("Rao.GM12878.50kb.txt")
+#Convert to sparse 3-column matrix using cooler2sparse from HiCcompare
+sparse_mat = HiCcompare::cooler2sparse(cool_mat)
+#Run SpectralTAD
+spec_tad = SpectralTAD(sparse_mat, chr = "chr20")
+
+```
+
+#### Working with HiC-Pro files
+
+HiC-Pro data comes with 2 files, the `.matrix` file and the `.bed` file. The `.matrix` file is a 3-column matrix where instead of coordinates as the 1st and 2nd column, there is an ID. The `.bed` file maps these IDs to genomic coordinates. The steps for analyzing these files is shown below:
+
+```{r, eval = FALSE}
+#Read in both files
+mat = read.table("Rao.GM12878.50kb.matrix")
+bed = read.table("Rao.GM12878.50kb.bed")
+#Convert to traditional three column matrix with coordinates
+sparse_mat = HiCcompare::hicpro2bedpe(mat, bed)
+#Run SpectralTAD
+SpectralTAD(sparse_mat, chr = "chr20")
+
+```
+
+## Running SpectralTAD
+
+Once matrices are in an acceptable format, SpectralTAD can be run with as little as two parameters or as many as eight. Below we show how to run the algorithm with just TAD detection and no quality filtering.
+
+```{r}
+#Get the rao contact matrix built into the package
+data("rao_chr20_25_rep")
+head(rao_chr20_25_rep)
+#We see that this is a sparse 3-column contact matrix
+#Running the algorithm with resolution specified
+results = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", resolution = 25000, qual_filter = FALSE, z_clust = FALSE)
+#Printing the bed file
+head(results)
+#We can see below that resolution can be estimated automatically estimated if necessary
+identical(results, SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = FALSE))
+
+
+```
+
+
+
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))
