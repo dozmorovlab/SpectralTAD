@@ -9,6 +9,7 @@
 #' @param eigenvalues The number of eigenvectors to be calculated. The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Defaults to 5.
 #' @param resolution The resolution of the contact matrix. If none selected the resolution is estimated by taking the most common distance between bins. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.
+#' @param gap_threshold Corresponds to the percentage of zeros allowed before a column/row is removed from analysis. 1=100%, .7 = 70%, etc. The default setting is 1.
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates in bed form. SpectralTAD works by using a sliding window that moves along the diagonal of the contact matrix. By default we use the biologically relevant maximum TAD size of 2mb and minimum size of 5 bins to determine the of this window. Within each window we calculate a Laplacian matrix and determine the location of TAD boundaries based on gaps between eigenvectors calculated from this matrix. The number of TADs in a given window is calculated by finding the number that maximize the silhouette score. A hierarchy of TADs is created by iteratively applying the function to sub-TADs. The number of levels in each hierarchy is determined by the user.
 
@@ -137,7 +138,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
   #Calculate sub-TADs for each seperable TAD
 
   sub_tads = lapply(tads, function(x) {
-    .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = FALSE, min_size = min_size)
+    .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = TRUE, min_size = min_size)
     })
 
   #Create a bed file for sub-TADs

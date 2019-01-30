@@ -24,6 +24,8 @@ SpectralTAD(cont_mat, chr, levels = 1, qual_filter = TRUE,
 \item{min_size}{The minimum allowable TAD size measured in bins. Defaults to 5.}
 
 \item{resolution}{The resolution of the contact matrix. If none selected the resolution is estimated by taking the most common distance between bins. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.}
+
+\item{gap_threshold}{Corresponds to the percentage of zeros allowed before a column/row is removed from analysis. 1=100%, .7 = 70%, etc. The default setting is 1.}
 }
 \description{
 Hierarchical Spectral Clustering of TADs

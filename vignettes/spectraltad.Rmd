@@ -25,10 +25,11 @@ The package is based around the windowed spectral clustering algorithm, introduc
 
 ## Installation
 
-```{r, eval = FALSE}
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
-BiocManager::install("SpectralTAD")
+```{r, eval = TRUE}
+# if (!requireNamespace("BiocManager", quietly=TRUE))
+#     install.packages("BiocManager")
+# BiocManager::install("SpectralTAD")
+#devtools::install_github("cresswellkg/SpectralTAD")
 library(SpectralTAD)
 ```
 
@@ -38,7 +39,7 @@ library(SpectralTAD)
 
 n x n contact matrices, are most commonly associated with data coming from the Bing Ren lab (http://chromosome.sdsc.edu/mouse/hi-c/download.html). These contact matrices are square and symmetric with entry ij corresponding to the number of contacts between region i and region j. Below is an example of a 5 x 5 region of an n x n contact matrix. Derived from Rao 2014, chromosome 19 data. Note the symmetry
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data("rao_chr20_25_rep")
 rao_chr20_25_rep = HiCcompare::sparse2full(rao_chr20_25_rep)
 rao_chr20_25_rep[1:5, 1:5]
@@ -48,7 +49,7 @@ rao_chr20_25_rep[1:5, 1:5]
 
 Sparse 3-column matrices, sometimes referred to as a coordinated lists, are matrices where the first and second column refer to region i and region j of the chromosome and the third column is the number of contacts between them. This style is becoming increasingly common and is associated with raw data from Rao (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525) and data output by the Juicer tool. 3-column matrices are handled internally in the package by converting them to n x n matrices using the `HiCcompare` package's `sparse2full` function. This may add some runtime for large matrices, when compared with n x n matrices. The first 5 rows of a typical sparse 3-column matrix is shown below.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 head(HiCcompare::full2sparse(rao_chr20_25_rep), 5)
 ```
 
@@ -56,7 +57,7 @@ head(HiCcompare::full2sparse(rao_chr20_25_rep), 5)
 
 n x (n+3) matrices are commonly associated with the TopDom tad-caller (http://zhoulab.usc.edu/TopDom/). These matrices consist of a normal n x n matrix but with 3 additional leading columns containg the chromosome, the start of the region and the end of the region. Regions in this case are determined by the resolution of the data. The typical n x (n+3) matrix is shown below.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 row.names(rao_chr20_25_rep) = NULL
 sub_mat = cbind.data.frame("chr19", as.numeric(colnames(rao_chr20_25_rep)), as.numeric(colnames(rao_chr20_25_rep))+25000, rao_chr20_25_rep)[1:10, 1:10]
 colnames(sub_mat) = NULL
@@ -105,7 +106,7 @@ SpectralTAD(sparse_mat, chr = "chr20")
 
 Once matrices are in an acceptable format, SpectralTAD can be run with as little as two parameters or as many as eight. Below we show how to run the algorithm with just TAD detection and no quality filtering.
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 #Get the rao contact matrix built into the package
 data("rao_chr20_25_rep")
 head(rao_chr20_25_rep)
@@ -113,42 +114,76 @@ head(rao_chr20_25_rep)
 #Running the algorithm with resolution specified
 results = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", resolution = 25000, qual_filter = FALSE, z_clust = FALSE)
 #Printing the bed file
-head(results)
-#We can see below that resolution can be estimated automatically estimated if necessary
-identical(results, SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = FALSE))
+head(results$Level_1, 5)
+#Repeating without specifying resolution
+no_res = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = FALSE)
+#We can see below that resolution can be estimated automatically if necessary
+identical(results, no_res)
+```
 
+## Filtering TADs
+
+### Silhouette score filtering
+
+One method for filtering TADs is using group-wise silhouette scores. This is done by getting the overall silhouette for each group and removing those with a score of less than .25. A low silhouette score for a given TAD indicates a poor level of connectivity within it.
+
+```{r}
+#Running SpectralTAD with silhouette score filtering
+qual_filt = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = TRUE, z_clust = FALSE, resolution = 25000)
+#Showing quality filtered results
+head(qual_filt$Level_1,5)
+#Quality filtering generally has different dimensions
+dim(qual_filt$Level_1)
+dim(results$Level_1)
+```
+
+The results when using the quality filtering option are altered to include a new column called `Sil_Score`. This column includes a group-wise silhouette score. In this example a single TAD was removed due to having poor organization (Low silhouette score).
+
+### Z-score filtering
+
+Z-score filtering is based on observations about the log-normality of the distance between eigenvector gaps from [@cresswell:2019aa]. Z-score filtering bypasses the uses of silhouette score and defines a TAD boundary as the area between consecutive regions where the z-score of the eigenvector gap is greater than 2.  
+
+```{r}
+z_filt = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = TRUE, resolution = 25000)
+head(z_filt$Level_1, 5)
+dim(z_filt)
+```
+
+We can see that TADs found using this method are generally more fine than those found using the silhouette score based filtering. Z-score filtering is more suited for people not interested in TAD hierarchies because the initial TADs detected are less broad than those by quality filtering. 
+
+## Finding hierarchical TADS
+
+Our method is specifically designed to find hierarchical TADs. To do so, users must specify how many levels they are interested in using the `levels` parameter. There is no limit to the number of levels but after a certain point no new TADs will be found due to limitations in TAD size or TAD quality. Hierarchies are found by running the algorithm initially and then iteratively running it on sub-TADs until none can be found. At the levels below the initial level we use z-score filtering by default.
+
+```{r}
+#Running SpectralTAD with 3 levels and no quality filtering
+spec_hier = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", resolution = 25000, qual_filter = FALSE, levels = 3)
+#Level 1 remains unchanged
+head(spec_hier$Level_1,5)
+#Level 2 contains the sub-TADs for level 1
+head(spec_hier$Level_2,5)
+#Level 3 contains even finer sub-TADs for level 1 and level 2
+head(spec_hier$Level_3,5)
 
 ```
 
+Note that as we move down levels, more gaps form indicating regions where sub-TADs are not present.
 
+## Removing gaps
 
+Though, it has been shown that windowed spectral clustering is more robust to sparsity than other common methods[@cresswell:2019aa], there is still some instability caused by consecutive regions of gaps. To counter this, we use a `gap_threshold` parameter to allow users to exclude regions based on how many zeros are included. By default this value is set to 1 which means only columns/rows with 100% of values being zero are removed before analysis. Accordingly, setting this value to .7 would mean rows/columns with 70% zeros would be removed. Since we are not interested in long-range contacts for TAD identification, this percentage only applies to the number of zeros within a specific distance of the diagonal (Defined by the maximum TAD size). Users must be careful not to filter too much as this can remove informative regions of the matrix.
 
-## Figures
+## Running SpectralTAD with parallelization
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+It is sometimes the case that people want to run SpectralTAD on multiple chromosomes at once in parallel. This can be done using the `SpectralTAD_Par` function. SpectralTAD_Par is identical to SpectralTAD but takes a list of contact matrices as an input. These matrices can be of any of the allowable types and mixing of types is allowed. Users are required to provide a vector of chromosomes, `chr_over`, where it is ordered such that each entry matches up with its corresponding contact matrix in the list of matrices. Users can also input list names using the `labels` parameter. In terms of parallelization, users can either input the number of cores they would like to use or the function will automatically use 1 less than the total number of cores on the computer in which it is ran. The function works on Linux/Mac and Windows with automatic OS detection built in. We show the steps below.
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r, eval = FALSE}
+#Creating replicates of our HiC data for demonstration
+cont_list = replicate(3,as.matrix(rao_chr20_25_rep), simplify = FALSE)
+#Creating a vector of chromosomes
+chr_over = c("chr20", "chr20", "chr20")
+#Creating a list of labels
+labels = c("Replicate 1", "Replicate 2", "Replicate 3")
+SpectralTAD_Par(cont_list = cont_list, chr_over = chr_over, labels = labels, cores = 3)
+
 ```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))

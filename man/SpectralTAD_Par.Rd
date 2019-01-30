@@ -28,6 +28,8 @@ SpectralTAD_Par(cont_list, chr_over, labels = NULL, levels = 1,
 \item{cores}{Number of cores to use. Defaults to total available cores minus one}
 
 \item{resolution}{The resolution of the contact matrices. If none selected, the resolution is estimated by taking the difference in start points between the first and second bin. For n x (n+3) contact matrices this value is automatically calculated from the first 3 columns.}
+
+\item{gap_threshold}{Corresponds to the percentage of zeros allowed before a column/row is removed from analysis. 1=100%, .7 = 70%, etc. The default setting is 1.}
 }
 \description{
 Hierarchical Spectral Clustering of TADs
