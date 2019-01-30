@@ -4,13 +4,15 @@ Version: 0.0.0.9000
 Author:
     Kellen Cresswell <cresswellkg@vcu.edu>, 
     Mikhail Dozmorov <mikhail.dozmorov@vcuhealth.org>
-Description: SpectralTAD is an R package designed to identify Topologically 
-Associating Domains (TADs) from Hi-C contact matrices. It uses a modified 
-version of spectral clustering that uses a sliding window to quickly detect 
-TADs. The function works on a range of different formats of contact matrices 
-and returns a bed file of TAD coordinates. The method does not require users 
-to adjust any parameters to work and gives them control over the number of 
-hierarchical levels to be returned.
+Maintainer: Kellen Cresswell <cresswellkg@vcu.edu>
+Description: 
+    SpectralTAD is an R package designed to identify Topologically Associated 
+    Domains (TADs) from Hi-C contact matrices. It uses a modified version of 
+    spectral clustering that uses a sliding window to quickly detect TADs. 
+    The function works on a range of different formats of contact matrices 
+    and returns a bed file of TAD coordinates. The method does not require 
+    users to adjust any parameters to work and gives them control over 
+    the number of hierarchical levels to be returned.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
