@@ -8,4 +8,4 @@
 
 - "Z-score filtering is based on observations about the log-normality of the distance between eigenvector gaps" - we need to write about it in the manuscript, with supplemental figure
 
-- "cont_mat" - is the format auto-detected?
+- "cont_mat" - is the format auto-detected? (Yes, the first step of the algorithm detects this and throws error if not recognized)
