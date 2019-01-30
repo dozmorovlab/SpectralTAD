@@ -1,6 +1,6 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "SpectralTAD Vignette"
+author: "Kellen Cresswell"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -29,7 +29,7 @@ The package is based around the windowed spectral clustering algorithm, introduc
 # if (!requireNamespace("BiocManager", quietly=TRUE))
 #     install.packages("BiocManager")
 # BiocManager::install("SpectralTAD")
-#devtools::install_github("cresswellkg/SpectralTAD")
+# devtools::install_github("cresswellkg/SpectralTAD")
 library(SpectralTAD)
 ```
 
@@ -187,3 +187,19 @@ labels = c("Replicate 1", "Replicate 2", "Replicate 3")
 SpectralTAD_Par(cont_list = cont_list, chr_over = chr_over, labels = labels, cores = 3)
 
 ```
+
+## Effect of matrix type on runtime
+
+The type of matrix input into the algorithm can affect runtimes for the algorithm. n x n matrices require no conversion and are the fastest. Meanwhile, n x (n+3) matrices take slightly longer to run due to the need to remove the first 3 columns. Sparse 3-column matrices have the highest runtimes due to the complexity of converting them to an n x n matrix. The times are summarized below, holding all other parameters constant.
+
+```{r}
+library(microbenchmark)
+#Converting to nxn
+n_n = HiCcompare::sparse2full(rao_chr20_25_rep)
+#Converting to nxn+3
+n_n_3 = cbind.data.frame("chr20", as.numeric(colnames(n_n)), as.numeric(colnames(n_n))+25000, n_n)
+
+
+microbenchmark(SpectralTAD(cont_mat = as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE), SpectralTAD(cont_mat = as.matrix(n_n), chr = "chr20", qual_filter = FALSE), SpectralTAD(cont_mat = as.matrix(n_n_3), chr = "chr20", qual_filter = FALSE), unit = "s")
+```
+

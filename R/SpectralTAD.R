@@ -17,10 +17,6 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
 
   #Calculate the number of rows and columns of the contact matrix
 
-  if (all(is.finite(cont_mat)) == FALSE) {
-    stop("Contact matrix must only contain real numbers")
-  }
-
   if (missing("chr")) {
     stop("Must specify chromosome")
   }
@@ -56,6 +52,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     #Remove bed file portion
 
     cont_mat = cont_mat[,-c(1:3)]
+    cont_mat = as.numeric(cont_mat)
 
     #Make column names correspond to bin start
 

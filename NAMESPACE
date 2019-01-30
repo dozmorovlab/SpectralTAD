@@ -2,10 +2,8 @@
 
 export(SpectralTAD)
 export(SpectralTAD_Par)
-import(BiocParallel)
 import(dplyr)
 importFrom(BiocParallel,MulticoreParam)
 importFrom(BiocParallel,SnowParam)
 importFrom(BiocParallel,bplapply)
 importFrom(BiocParallel,register)
-importFrom(magrittr,"%>%")
