@@ -62,6 +62,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     #Remove bed file portion
 
     cont_mat = cont_mat[,-c(1:3)]
+    cont_mat = as.numeric(cont_mat)
 
     if (all(is.finite(cont_mat)) == FALSE) {
       stop("Contact matrix must only contain real numbers")
