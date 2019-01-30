@@ -29,7 +29,7 @@ The package is based around the windowed spectral clustering algorithm, introduc
 # if (!requireNamespace("BiocManager", quietly=TRUE))
 #     install.packages("BiocManager")
 # BiocManager::install("SpectralTAD")
-#devtools::install_github("cresswellkg/SpectralTAD")
+devtools::install_github("cresswellkg/SpectralTAD")
 library(SpectralTAD)
 ```
 
@@ -177,7 +177,7 @@ Though, it has been shown that windowed spectral clustering is more robust to sp
 
 It is sometimes the case that people want to run SpectralTAD on multiple chromosomes at once in parallel. This can be done using the `SpectralTAD_Par` function. SpectralTAD_Par is identical to SpectralTAD but takes a list of contact matrices as an input. These matrices can be of any of the allowable types and mixing of types is allowed. Users are required to provide a vector of chromosomes, `chr_over`, where it is ordered such that each entry matches up with its corresponding contact matrix in the list of matrices. Users can also input list names using the `labels` parameter. In terms of parallelization, users can either input the number of cores they would like to use or the function will automatically use 1 less than the total number of cores on the computer in which it is ran. The function works on Linux/Mac and Windows with automatic OS detection built in. We show the steps below.
 
-```{r}
+```{r, eval = FALSE}
 #Creating replicates of our HiC data for demonstration
 cont_list = replicate(3,as.matrix(rao_chr20_25_rep), simplify = FALSE)
 #Creating a vector of chromosomes
