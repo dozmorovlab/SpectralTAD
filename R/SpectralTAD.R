@@ -24,13 +24,23 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
   row_test = dim(cont_mat)[1]
   col_test = dim(cont_mat)[2]
 
+  if (row_test == col_test) {
+    if (all(is.finite(cont_mat)) == FALSE) {
+      stop("Contact matrix must only contain real numbers")
+    }
+  }
+
   if (col_test == 3) {
 
     #Convert sparse matrix to n x n matrix
 
+    message("Converting to n x n matrix")
+
     cont_mat = HiCcompare::sparse2full(cont_mat)
 
-    message("Converting to n x n matrix")
+    if (all(is.finite(cont_mat)) == FALSE) {
+      stop("Contact matrix must only contain real numbers")
+    }
 
     if (resolution == "auto") {
       message("Estimating resolution")
@@ -52,7 +62,10 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = 
     #Remove bed file portion
 
     cont_mat = cont_mat[,-c(1:3)]
-    cont_mat = as.numeric(cont_mat)
+
+    if (all(is.finite(cont_mat)) == FALSE) {
+      stop("Contact matrix must only contain real numbers")
+    }
 
     #Make column names correspond to bin start
 
