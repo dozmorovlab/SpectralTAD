@@ -1,14 +1,30 @@
 ---
 title: "SpectralTAD Vignette"
-author: "Kellen Cresswell"
-date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette:
-    toc: true
+author:
+- name: Kellen Cresswell
+  affiliation:
+  - &1 Department of Biostatistics, Virginia Commonwealth University, Richmond, VA
+- name: Mikhail Dozmorov
+  affiliation:
+  - *1
+date: '`r format(Sys.Date(), "%B %e, %Y")`'
+abstract: >
+    SpectralTAD is an R package designed to identify Topologically Associated 
+    Domains (TADs) from Hi-C contact matrices. It uses a modified version of 
+    spectral clustering that uses a sliding window to quickly detect TADs. 
+    The function works on a range of different formats of contact matrices 
+    and returns a bed file of TAD coordinates. The method does not require 
+    users to adjust any parameters to work and gives them control over 
+    the number of hierarchical levels to be returned.
+package: SpectralTAD
+output:
+    BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{HiCcompare Usage Vignette}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{HMP16SData}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
+editor_options:
+    chunk_output_type: console
 bibliography: pack_ref.bib
 ---
 
