@@ -10,7 +10,7 @@ are less well-pronounced yet sufficiently distinct to be recognized as TADs.
 The two main functions are `SpectralTAD()` and `SpectralTAD_Par()`. 
 `SpectralTAD()` is a function for calling TADs. `SpectralTAD_Par()` 
 is the parallelized version. The input data can be an $n \times n$, 
-an $n \times (n+3)$, or a sparse 3-column matrix (see the [vignette](vignettes/SpectralTAD.Rmd)).
+an $n \times (n+3)$, or a sparse 3-column matrix (see the [vignette]
 
 ## Installation
 
