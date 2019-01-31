@@ -24,7 +24,7 @@
 #' For n x (n+3) contact matrices, this value is automatically calculated
 #' from the first 3 columns.
 #' @param gap_threshold Corresponds to the percentage of zeros allowed before
-#' a column/row is removed from analysis. 1=100%, .7 = 70%, etc. Default is 1.
+#' a column/row is removed from analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
 #' @param cores Number of cores to use. Defaults to total available cores minus one.
 #' @export
 #' @details This is the parallelized version of the SpectralTAD() function.

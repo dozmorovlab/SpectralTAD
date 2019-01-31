@@ -20,7 +20,7 @@
 #' For n x (n+3) contact matrices, this value is automatically calculated
 #' from the first three columns.
 #' @param gap_threshold Corresponds to the percentage of zeros allowed before
-#' a column/row is removed from the analysis. 1=100%, .7 = 70%, etc. Default is 1.
+#' a column/row is removed from the analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix,
 #' or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates
