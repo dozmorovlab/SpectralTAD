@@ -59,6 +59,7 @@ $n \times n$ contact matrices, are most commonly associated with data coming fro
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data("rao_chr20_25_rep")
 rao_chr20_25_rep = HiCcompare::sparse2full(rao_chr20_25_rep)
+row.names(rao_chr20_25_rep) = colnames(rao_chr20_25_rep) = format(as.numeric(row.names(rao_chr20_25_rep)), scientific = FALSE)
 rao_chr20_25_rep[1:5, 1:5]
 ```
 
