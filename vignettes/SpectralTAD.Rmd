@@ -20,7 +20,7 @@ package: SpectralTAD
 output:
     BiocStyle::html_document
 vignette: >
-    %\VignetteIndexEntry{HMP16SData}
+    %\VignetteIndexEntry{SpectralTAD}
     %\VignetteEncoding{UTF-8}
     %\VignetteEngine{knitr::rmarkdown}
 editor_options:
