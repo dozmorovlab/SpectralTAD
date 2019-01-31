@@ -9,6 +9,7 @@ vignette: >
   %\VignetteIndexEntry{HiCcompare Usage Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: pack_ref.bib
 ---
 
 ```{r set-options, echo=FALSE, cache=FALSE}
@@ -19,7 +20,7 @@ options(width = 400)
 
 `SpectralTAD` is a package designed to allow for fast hierarchical TAD calling on a wide-variety of chromatin conformation capture (Hi-C) data. `SpectralTAD` takes a contact matrix as an input and outputs a BED file containing coordinates corresponding to TAD locations. The package contains two functions, `SpectralTAD()` and `SpectralTAD_Par()` with SpectralTAD being a single-CPU TAD-caller and `SpectralTAD_Par` being the parallelized version. This package provides flexibility in the data it accepts, allowing for $n \times n$ (square numerical matrix), $n \times (n+3)$ (square numerical matrix with the additional chromosome, start, end columns), and 3-column sparse matrices (described below). There are no parameters required for running the functions, though certain methods for customizing the results are available. The idea is to give users the freedom to control how they call TADs while giving them the option to perform it in an unsupervised manner.
 
-The package is based around the windowed spectral clustering algorithm, introduced by [@cresswell:2019aa] [??? Make references work], which is designed to be robust to sparsity, noise, and sequencing depth of Hi-C data. 
+The package is based around the windowed spectral clustering algorithm, introduced by [@cresswell:2019aa] , which is designed to be robust to sparsity, noise, and sequencing depth of Hi-C data. 
 
 # Getting Started
 
@@ -29,7 +30,7 @@ The package is based around the windowed spectral clustering algorithm, introduc
 # if (!requireNamespace("BiocManager", quietly=TRUE))
 #     install.packages("BiocManager")
 # BiocManager::install("SpectralTAD")
-devtools::install_github("cresswellkg/SpectralTAD")
+#devtools::install_github("cresswellkg/SpectralTAD")
 library(SpectralTAD)
 ```
 
@@ -37,7 +38,7 @@ library(SpectralTAD)
 
 ### Working with $n \times n$ matrices
 
-$n \times n$ contact matrices, are most commonly associated with data coming from the Bing Ren lab (http://chromosome.sdsc.edu/mouse/hi-c/download.html). These contact matrices are square and symmetric with entry $ij$ corresponding to the number of contacts between region $i$ and region $j$. Below is an example of a $5 \times 5$ region of an $n \times n$ contact matrix. Derived from Rao 2014 [??? Add ref and make it working], chromosome 19 data. Note the symmetry around the diagonal - the typical shape of chromatin interaction matrix.
+$n \times n$ contact matrices, are most commonly associated with data coming from the Bing Ren lab (http://chromosome.sdsc.edu/mouse/hi-c/download.html). These contact matrices are square and symmetric with entry $ij$ corresponding to the number of contacts between region $i$ and region $j$. Below is an example of a $5 \times 5$ region of an $n \times n$ contact matrix. Derived from [@Rao:2014aa], chromosome 20 data at 25kb resolution. Note the symmetry around the diagonal - the typical shape of chromatin interaction matrix.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data("rao_chr20_25_rep")
@@ -49,8 +50,6 @@ rao_chr20_25_rep[1:5, 1:5]
 
 $n \times (n+3)$ matrices are commonly associated with the TopDom tad-caller (http://zhoulab.usc.edu/TopDom/). These matrices consist of a normal $n \times n$ matrix but with 3 additional leading columns containg the chromosome, the start of the region and the end of the region. Regions in this case are determined by the resolution of the data. The typical $n \times (n+3)$ matrix is shown below.
 
-[??? When compiled, one row number is formatted like 1e+05, while the others are like 125000. Can you make them all similar in numeric notation?]
-
 ```{r, echo = FALSE, warning = FALSE}
 row.names(rao_chr20_25_rep) = NULL
 sub_mat = cbind.data.frame("chr19", as.numeric(colnames(rao_chr20_25_rep)), as.numeric(colnames(rao_chr20_25_rep))+25000, rao_chr20_25_rep)[1:10, 1:10]
@@ -61,7 +60,7 @@ sub_mat
 
 ### Working with sparse 3-column matrices
 
-Sparse 3-column matrices, sometimes referred to as a coordinated lists, are matrices where the first and second column refer to region $i$ and region $j$ of the chromosome, and the third column is the number of contacts between them. This style is becoming increasingly popular and is associated with raw data from Rao (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525), and is the data output produced by the Juicer tool [??? Add reference]. 3-column matrices are handled internally in the package by converting them to $n \times n$ matrices using the `HiCcompare` package's `sparse2full()` function. The first 5 rows of a typical sparse 3-column matrix is shown below.
+Sparse 3-column matrices, sometimes referred to as a coordinated lists, are matrices where the first and second column refer to region $i$ and region $j$ of the chromosome, and the third column is the number of contacts between them. This style is becoming increasingly popular and is associated with raw data from Rao (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525), and is the data output produced by the Juicer tool [@Durand:2016aa]. 3-column matrices are handled internally in the package by converting them to $n \times n$ matrices using the `HiCcompare` package's `sparse2full()` function. The first 5 rows of a typical sparse 3-column matrix is shown below.
 
 ```{r, echo = FALSE, warning = FALSE}
 head(HiCcompare::full2sparse(rao_chr20_25_rep), 5)
@@ -73,10 +72,10 @@ Users can also find TADs from data outputted by `cooler` (http://cooler.readthed
 
 #### Working with .cool files
 
-We can pre-process and use .cool files using the following steps:
+The cooler software can be downloaded from http://cooler.readthedocs.io/en/latest/index.html. It essentially provides access to a catalog of popular HiC datasets. We can pre-process and use .cool files that are associated with cooler files using the following steps:
 
 1. Download `.cool` file from (ftp://cooler.csail.mit.edu/coolers)
-2. Convert to text file using `cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool > Rao.GM12878.50kb.txt` [??? Describe how to install cooler]
+2. Convert to text file using `cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool > Rao.GM12878.50kb.txt` 
 3. Run the code below
 
 ```{r, eval = FALSE}
@@ -218,3 +217,5 @@ microbenchmark(quality_filter = SpectralTAD(cont_mat = n_n, chr = "chr20", qual_
 ```
 
 As can be seen using the z-score method is the fastest.
+
+# References
