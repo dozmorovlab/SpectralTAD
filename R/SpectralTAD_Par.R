@@ -40,7 +40,7 @@
 #' A hierarchy of TADs is created by iteratively applying the function to
 #' sub-TADs. The number of levels in each hierarchy is determined by the user.
 
-SpectralTAD_Par = function(cont_list, chr_over, labels = NULL, levels = 1,  qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2, min_size =5, cores = "auto", resolution = "auto") {
+SpectralTAD_Par = function(cont_list, chr_over, labels = NULL, levels = 1,  qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2, min_size =5, cores = "auto", resolution = "auto", gap_threshold = 1) {
 
   if (cores == "auto") {
   # Check how many cores you have
