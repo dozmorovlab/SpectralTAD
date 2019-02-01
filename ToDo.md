@@ -1,5 +1,9 @@
 Note 80 characters per line limit, read history https://en.wikipedia.org/wiki/Characters_per_line
 
+- Add an example how-to run to the help section of each function.
+
+- Fix things noted by John
+
 # John's review
 
 - warning messages when installing package from github:
