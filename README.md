@@ -9,8 +9,8 @@ are less well-pronounced yet sufficiently distinct to be recognized as TADs.
 
 The two main functions are `SpectralTAD()` and `SpectralTAD_Par()`. 
 `SpectralTAD()` is a function for calling TADs. `SpectralTAD_Par()` 
-is the parallelized version. The input data can be an $n \times n$, 
-an $n \times (n+3)$, or a sparse 3-column matrix (see vignette (`browseVignettes("SpectralTAD"))
+is the parallelized version. The input data can be an n x n, 
+an n x (n+3), or a sparse 3-column matrix (see vignette (`browseVignettes("SpectralTAD"))
 
 ## Installation
 
@@ -34,8 +34,8 @@ library(SpectralTAD)
 
 There are three types of input accepted:
 
-1. $n \times n$ contact matrices
-2. $n \times (n+3)$ contact matrices
+1. n x n contact matrices
+2. n x (n+3) contact matrices
 3. 3-column sparse contact matrices
 
 These formats are explained in depth in the [vignette](vignettes/SpectralTAD.Rmd).
