@@ -39,3 +39,10 @@ Note 80 characters per line limit, read history https://en.wikipedia.org/wiki/Ch
 - lines too long in code
 
 - gap_threshold error in SpectralTAD_Par
+
+Note 80 characters per line limit, read history https://en.wikipedia.org/wiki/Characters_per_line
+
+- Add an example how-to run to the help section of each function.
+
++ Fix things noted by John
+
