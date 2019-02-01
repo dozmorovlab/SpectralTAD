@@ -14,6 +14,21 @@ an n x (n+3), or a sparse 3-column matrix (see vignette (`browseVignettes("Spect
 
 ## Installation
 
+If necessary, install the dependencies:
+
+```
+install.packages(c('dplyr', 'PRIMME', 'cluster',
+    'Matrix',
+    'parallel',
+    'magrittr',
+    'HiCcompare'))
+
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install('BiocParallel')
+```
+
+
 The latest version of `SpectralTAD` can be directly installed from Github:
 
 ```
