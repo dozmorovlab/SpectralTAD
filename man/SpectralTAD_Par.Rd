@@ -4,7 +4,7 @@
 \alias{SpectralTAD_Par}
 \title{Parallelized Hierarchical Spectral Clustering of TADs}
 \usage{
-SpectralTAD_Par(cont_list, chr_over, labels = NULL, levels = 1,
+SpectralTAD_Par(cont_list, chr, labels = NULL, levels = 1,
   qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2,
   min_size = 5, cores = "auto", resolution = "auto",
   gap_threshold = 1)
@@ -16,7 +16,7 @@ are chromosome, start and end coordinates of the regions.
 If an x n matrix is used, the column names must correspond to
 the start point of the corresponding bin. Required.}
 
-\item{chr_over}{Vector of chromosomes in the same order as their
+\item{chr}{Vector of chromosomes in the same order as their
 corresponding contact matrices. Must be same length as cont_list. Required.}
 
 \item{labels}{Vector of labels used to name each contact matrix. Must be

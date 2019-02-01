@@ -6,7 +6,7 @@
 #' are chromosome, start and end coordinates of the regions.
 #' If an x n matrix is used, the column names must correspond to
 #' the start point of the corresponding bin. Required.
-#' @param chr_over Vector of chromosomes in the same order as their
+#' @param chr Vector of chromosomes in the same order as their
 #' corresponding contact matrices. Must be same length as cont_list. Required.
 #' @param labels Vector of labels used to name each contact matrix. Must be
 #' same length as cont_list. Default is NULL.
@@ -40,7 +40,10 @@
 #' A hierarchy of TADs is created by iteratively applying the function to
 #' sub-TADs. The number of levels in each hierarchy is determined by the user.
 
-SpectralTAD_Par = function(cont_list, chr_over, labels = NULL, levels = 1,  qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2, min_size =5, cores = "auto", resolution = "auto", gap_threshold = 1) {
+SpectralTAD_Par = function(cont_list, chr, labels = NULL, levels = 1,
+                           qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2,
+                           min_size =5, cores = "auto",
+                           resolution = "auto", gap_threshold = 1) {
 
   if (cores == "auto") {
   # Check how many cores you have
@@ -60,7 +63,14 @@ SpectralTAD_Par = function(cont_list, chr_over, labels = NULL, levels = 1,  qual
 
   #Run SpectralTAD simultaneously on each contact matrix
 
-  bed = BiocParallel::bplapply(1:length(cont_list), function(x, spec_fun, cont_list,eigenvalues, z_clust, qual_filter, levels, min_size, chr_over, gap_threshold) spec_fun(cont_mat = cont_list[[x]],  chr_over[[x]], levels = levels, qual_filter = qual_filter, z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size), spec_fun = SpectralTAD, cont_list = cont_list, eigenvalues = eigenvalues, min_size = min_size, levels = levels,z_clust = z_clust, qual_filter = qual_filter, chr_over = chr_over, gap_threshold = gap_threshold)
+  bed = BiocParallel::bplapply(1:length(cont_list), function(x, spec_fun, cont_list,
+                                                             eigenvalues, z_clust, qual_filter, levels, min_size,
+                                                             chr, gap_threshold) spec_fun(cont_mat = cont_list[[x]],
+                                                             chr[[x]], levels = levels, qual_filter = qual_filter,
+                                                             z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size),
+                                                             spec_fun = SpectralTAD, cont_list = cont_list, eigenvalues = eigenvalues,
+                                                             min_size = min_size, levels = levels,z_clust = z_clust, qual_filter = qual_filter,
+                                                             chr = chr, gap_threshold = gap_threshold)
 
   #Assign labels to identify each contact matrix
 
