@@ -21,6 +21,7 @@
 #' from the first three columns.
 #' @param gap_threshold Corresponds to the percentage of zeros allowed before
 #' a column/row is removed from the analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
+#' @return A list where each entry is a bed file corresponding to the level of the hierarchy.
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix,
 #' or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates
@@ -34,7 +35,8 @@
 #' A hierarchy of TADs is created by iteratively applying the function to
 #' sub-TADs. The number of levels in each hierarchy is determined by the user.
 
-SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE, z_clust = FALSE, eigenvalues = 2, min_size = 5, resolution = "auto", gap_threshold = 1) {
+SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE,
+                       z_clust = FALSE, eigenvalues = 2, min_size = 5, resolution = "auto", gap_threshold = 1) {
 
   #Calculate the number of rows and columns of the contact matrix
 

@@ -27,6 +27,8 @@
 #' a column/row is removed from analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
 #' @param cores Number of cores to use. Defaults to total available cores minus one.
 #' @export
+#' @return List of lists where each entry is a list of bed files corresponding
+#' to TADs seperated by hierarchies
 #' @details This is the parallelized version of the SpectralTAD() function.
 #' Given a sparse 3 column, an n x n contact matrix,
 #' or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates

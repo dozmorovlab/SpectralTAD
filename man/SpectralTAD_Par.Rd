@@ -46,6 +46,10 @@ from the first 3 columns.}
 \item{gap_threshold}{Corresponds to the percentage of zeros allowed before
 a column/row is removed from analysis. 1=100\%, .7 = 70\%, etc. Default is 1.}
 }
+\value{
+List of lists where each entry is a list of bed files corresponding
+to TADs seperated by hierarchies
+}
 \description{
 Parallelized Hierarchical Spectral Clustering of TADs
 }
