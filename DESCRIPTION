@@ -31,5 +31,6 @@ Suggests:
     BiocManager,
     BiocStyle,
     knitr,
-    rmarkdown
+    rmarkdown,
+    microbenchmark
 VignetteBuilder: knitr
