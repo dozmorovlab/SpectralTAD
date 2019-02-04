@@ -36,3 +36,4 @@ Suggests:
     microbenchmark,
     testthat
 VignetteBuilder: knitr
+biocViews: Software, HiC, Sequencing, FeatureExtraction
