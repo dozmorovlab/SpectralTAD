@@ -41,6 +41,16 @@
 #' window is calculated by finding the number that maximize the silhouette score.
 #' A hierarchy of TADs is created by iteratively applying the function to
 #' sub-TADs. The number of levels in each hierarchy is determined by the user.
+#' @examples
+#' #Read in data
+#' data("rao_chr20_25_rep")
+#' #Make a list of matrices
+#' mat_list = list(rao_chr20_25_rep, rao_chr20_25_rep)
+#' #Make a vector of chromosomes
+#' chr = c("chr20", "chr20")
+#' #Make a vector of labels
+#' labels = c("run1", "run2")
+#' spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels)
 
 SpectralTAD_Par = function(cont_list, chr, labels = NULL, levels = 1,
                            qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2,

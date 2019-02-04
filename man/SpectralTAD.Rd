@@ -57,3 +57,9 @@ window is calculated by finding the number that maximizes the silhouette score.
 A hierarchy of TADs is created by iteratively applying the function to
 sub-TADs. The number of levels in each hierarchy is determined by the user.
 }
+\examples{
+#Read in data
+data("rao_chr20_25_rep")
+#Find TADs
+spec_table <- SpectralTAD(rao_chr20_25_rep, chr= 'chr20')
+}
