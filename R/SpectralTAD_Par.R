@@ -25,7 +25,8 @@
 #' from the first 3 columns.
 #' @param gap_threshold Corresponds to the percentage of zeros allowed before
 #' a column/row is removed from analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
-#' @param cores Number of cores to use. Defaults to total available cores minus one.
+#' @param cores Number of cores to use. Defaults to total available
+#' cores minus one.
 #' @export
 #' @return List of lists where each entry is a list of bed files corresponding
 #' to TADs seperated by hierarchies

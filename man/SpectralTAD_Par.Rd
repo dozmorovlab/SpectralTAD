@@ -36,7 +36,8 @@ The default and suggested setting is 2.}
 
 \item{min_size}{The minimum allowable TAD size measured in bins. Default is 5.}
 
-\item{cores}{Number of cores to use. Defaults to total available cores minus one.}
+\item{cores}{Number of cores to use. Defaults to total available
+cores minus one.}
 
 \item{resolution}{The resolution of the contact matrix. If none selected,
 the resolution is estimated by taking the most common distance between bins.

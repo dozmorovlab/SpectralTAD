@@ -4,9 +4,13 @@ author:
 - name: Kellen Cresswell
   affiliation:
   - &1 Department of Biostatistics, Virginia Commonwealth University, Richmond, VA
+- name: John Stansfield
+  affiliation:
+  - *1
 - name: Mikhail Dozmorov
   affiliation:
   - *1
+
 date: '`r format(Sys.Date(), "%B %e, %Y")`'
 abstract: >
     SpectralTAD is an R package designed to identify Topologically Associated 
