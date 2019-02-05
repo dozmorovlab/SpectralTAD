@@ -308,8 +308,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE,
 
     #Project eigenvectors onto a unit circle
 
-    vm = matrix(kronecker(rep(1,k), as.matrix(sqrt(rowSums(eig_vecs^2)))),n,k)
-    eig_vecs = eig_vecs/vm
+    eig_vecs = crossprod(diag(diag(tcrossprod(eig_vecs))^(-1/2)), eig_vecs)
 
     #Get distance between points on circle
 
