@@ -479,12 +479,16 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE,
 
       #Put coordinates and group IDs into data frame
 
+      if (length(end_group) == 0) {
+        end_group = dplyr::bind_rows()
+      } else {
+
       end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = end_group)
 
       #Convert IDs to coordinates of endpoint to avoid overlaps
 
       end_group = end_group %>%dplyr::mutate(group_place = Group) %>%dplyr::group_by(group_place) %>%dplyr::mutate(Group = max(ID)) %>% ungroup() %>% dplyr::select(ID, Group)
-
+      }
     }
 
     #End while loop if window reaches end of contact matrix
