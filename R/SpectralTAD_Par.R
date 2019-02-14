@@ -13,9 +13,9 @@
 #' @param levels The number of levels of the TAD hierarchy to be calculated.
 #' The default setting is 1.
 #' @param qual_filter Option to turn on quality filtering which removes TADs
-#' with negative silhouette scores (poorly organized TADs). Default is TRUE.
+#' with negative silhouette scores (poorly organized TADs). Default is FALSE.
 #' @param z_clust Option to filter sub-TADs based on the z-score of
-#' their eigenvector gaps. Default is FALSE.
+#' their eigenvector gaps. Default is TRUE.
 #' @param eigenvalues The number of eigenvectors to be calculated.
 #' The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Default is 5.
@@ -54,7 +54,7 @@
 #' spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels)
 
 SpectralTAD_Par = function(cont_list, chr, labels = NULL, levels = 1,
-                           qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2,
+                           qual_filter = FALSE, z_clust = TRUE, eigenvalues = 2,
                            min_size =5, cores = "auto",
                            resolution = "auto", gap_threshold = 1) {
 

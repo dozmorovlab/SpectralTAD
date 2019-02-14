@@ -9,9 +9,9 @@
 #' @param levels The number of levels of the TAD hierarchy to be calculated.
 #' The default setting is 1.
 #' @param qual_filter Option to turn on quality filtering which removes TADs
-#' with negative silhouette scores (poorly organized TADs). Default is TRUE.
+#' with negative silhouette scores (poorly organized TADs). Default is FALSE.
 #' @param z_clust Option to filter sub-TADs based on the z-score of
-#' their eigenvector gaps. Default is FALSE.
+#' their eigenvector gaps. Default is TRUE.
 #' @param eigenvalues The number of eigenvectors to be calculated.
 #' The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Default is 5.
@@ -41,8 +41,8 @@
 #' spec_table <- SpectralTAD(rao_chr20_25_rep, chr= 'chr20')
 
 
-SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = TRUE,
-                       z_clust = FALSE, eigenvalues = 2, min_size = 5, resolution = "auto", gap_threshold = 1) {
+SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
+                       z_clust = TRUE, eigenvalues = 2, min_size = 5, resolution = "auto", gap_threshold = 1) {
 
   #Calculate the number of rows and columns of the contact matrix
 

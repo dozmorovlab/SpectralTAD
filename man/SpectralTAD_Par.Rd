@@ -5,7 +5,7 @@
 \title{Parallelized Hierarchical Spectral Clustering of TADs}
 \usage{
 SpectralTAD_Par(cont_list, chr, labels = NULL, levels = 1,
-  qual_filter = FALSE, z_clust = FALSE, eigenvalues = 2,
+  qual_filter = FALSE, z_clust = TRUE, eigenvalues = 2,
   min_size = 5, cores = "auto", resolution = "auto",
   gap_threshold = 1)
 }
@@ -26,10 +26,10 @@ same length as cont_list. Default is NULL.}
 The default setting is 1.}
 
 \item{qual_filter}{Option to turn on quality filtering which removes TADs
-with negative silhouette scores (poorly organized TADs). Default is TRUE.}
+with negative silhouette scores (poorly organized TADs). Default is FALSE.}
 
 \item{z_clust}{Option to filter sub-TADs based on the z-score of
-their eigenvector gaps. Default is FALSE.}
+their eigenvector gaps. Default is TRUE.}
 
 \item{eigenvalues}{The number of eigenvectors to be calculated.
 The default and suggested setting is 2.}
