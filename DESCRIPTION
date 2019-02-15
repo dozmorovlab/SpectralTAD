@@ -1,6 +1,6 @@
 Package: SpectralTAD
 Title: SpectralTAD: Hierarchical TAD detection using spectral clustering
-Version: 0.99.3
+Version: 0.99.4
 Author:
     Kellen Cresswell <cresswellkg@vcu.edu>,
     John Stansfield <stansfieldjc@vcu.edu>, 
@@ -35,5 +35,6 @@ Suggests:
     rmarkdown,
     microbenchmark,
     testthat
+Depends: R (>= 2.10)
 VignetteBuilder: knitr
 biocViews: Software, HiC, Sequencing, FeatureExtraction, Clustering

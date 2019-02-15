@@ -3,7 +3,6 @@
 export(SpectralTAD)
 export(SpectralTAD_Par)
 import(dplyr)
-import(magrittr)
 importFrom(BiocParallel,MulticoreParam)
 importFrom(BiocParallel,SnowParam)
 importFrom(BiocParallel,bplapply)
