@@ -105,7 +105,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     #Throw error if matrix does not correspond to known matrix type
 
     stop("Contact matrix must be sparse or n x n or n x (n+3)!")
-    break
+
   } else if ( (resolution == "auto") & (col_test-row_test == 0) ) {
       message("Estimating resolution")
 
