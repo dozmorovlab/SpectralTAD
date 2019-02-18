@@ -242,7 +242,13 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     non_gaps_within = which((colSums(sub_filt == 0))<zero_thresh)
 
     sub_filt = sub_filt[non_gaps_within, non_gaps_within]
-
+    
+    if (length(nrow(sub_filt)) == 0) {
+      start = end
+      end = start+window_size
+      next
+    }
+    
     if (nrow(sub_filt) < min_size*2) {
       start = end
       end = start+window_size
