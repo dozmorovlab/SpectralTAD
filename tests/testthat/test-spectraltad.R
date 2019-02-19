@@ -1,6 +1,7 @@
 context("test-spectraltad")
 
 test_that("TAD calling works", {
-  expect_equal(SpectralTAD(rao_chr2), 4)
+  data("rao_chr20_25_rep")
+  expect_equal(nrow(SpectralTAD(rao_chr20_25_rep, "chr20")$Level_1), 85)
 })
 
