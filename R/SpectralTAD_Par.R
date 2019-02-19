@@ -76,7 +76,7 @@ SpectralTAD_Par = function(cont_list, chr, labels = NULL, levels = 1,
 
   #Run SpectralTAD simultaneously on each contact matrix
 
-  bed = BiocParallel::bplapply(1:length(cont_list), function(x, spec_fun, cont_list,
+  bed = BiocParallel::bplapply(seq_len(length(cont_list)), function(x, spec_fun, cont_list,
                                                              eigenvalues, z_clust, qual_filter, levels, min_size,
                                                              chr, gap_threshold) spec_fun(cont_mat = cont_list[[x]],
                                                              chr[[x]], levels = levels, qual_filter = qual_filter,

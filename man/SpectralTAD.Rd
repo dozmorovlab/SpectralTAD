@@ -6,7 +6,7 @@
 \usage{
 SpectralTAD(cont_mat, chr, levels = 1, qual_filter = FALSE,
   z_clust = TRUE, eigenvalues = 2, min_size = 5,
-  resolution = "auto", gap_threshold = 1)
+  resolution = "auto", gap_threshold = 1, GRranges)
 }
 \arguments{
 \item{cont_mat}{Contact matrix in either sparse 3 column, n x n or n x (n+3)

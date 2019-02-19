@@ -1,6 +1,6 @@
 Package: SpectralTAD
 Title: SpectralTAD: Hierarchical TAD detection using spectral clustering
-Version: 0.99.6
+Version: 0.99.7
 Author:
     Kellen Cresswell <cresswellkg@vcu.edu>,
     John Stansfield <stansfieldjc@vcu.edu>, 
@@ -16,7 +16,7 @@ Description:
     the number of hierarchical levels to be returned.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Imports: 
     dplyr,
     PRIMME,

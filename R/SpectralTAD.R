@@ -42,10 +42,16 @@
 
 
 SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
-                       z_clust = TRUE, eigenvalues = 2, min_size = 5, resolution = "auto", gap_threshold = 1) {
+                       z_clust = TRUE, eigenvalues = 2, min_size = 5, 
+                       resolution = "auto", gap_threshold = 1, GRranges) {
 
   #Calculate the number of rows and columns of the contact matrix
-
+  
+  #Check for matrix and convert if not
+  if (!is.matrix(cont_mat)) {
+    cont_mat = as.matrix(cont_mat)
+  }
+  
   if (missing("chr")) {
     stop("Must specify chromosome")
   }
@@ -296,13 +302,13 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     #Calculate the range of possible clusters
 
-    clusters = 1:ceiling( (end-start+1)/min_size)
+    clusters = seq_len(ceiling( (end-start+1)/min_size))
 
     #Normalize the eigenvectors from 0-1
 
     norm_ones = sqrt(dim(sub_mat)[2])
 
-    for (i in 1:dim(eig_vecs)[2]) {
+    for (i in seq_len(dim(eig_vecs)[2])) {
       eig_vecs[,i] = (eig_vecs[,i]/sqrt(sum(eig_vecs[,i]^2)))  * norm_ones
       if (eig_vecs[1,i] !=0) {
         eig_vecs[,i] = -1*eig_vecs[,i] * sign(eig_vecs[1,i])
@@ -350,7 +356,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
       widths = (TAD_end-TAD_start)+1
 
-      memberships = unlist(lapply(1:length(TAD_start), function(x) rep(x,widths[x])))
+      memberships = unlist(lapply(seq_len(length(TAD_start)), function(x) rep(x,widths[x])))
 
       #Create groups
 
@@ -459,7 +465,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
         #Assign locations of the window memberships based on cutpoints
 
         memberships = c()
-        for (i in 1:length(group_size)) {
+        for (i in seq_len(length(group_size))) {
           memberships = c(memberships, rep(i,times = group_size[i]))
         }
 
