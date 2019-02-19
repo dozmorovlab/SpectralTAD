@@ -5,7 +5,6 @@ author:
   affiliation:
   - &1 Department of Biostatistics, Virginia Commonwealth University, Richmond, VA
 - name: John Stansfield
-  affiliation:
   - *1
 - name: Mikhail Dozmorov
   affiliation:
@@ -17,9 +16,10 @@ abstract: >
     Domains (TADs) from Hi-C contact matrices. It uses a modified version of 
     spectral clustering that uses a sliding window to quickly detect TADs. 
     The function works on a range of different formats of contact matrices 
-    and returns a bed file of TAD coordinates. The method does not require 
-    users to adjust any parameters to work and gives them control over 
-    the number of hierarchical levels to be returned.
+    and returns a list of data frames or GRanges in BED format with TAD coordinates,
+    seperated by hierarchy level. The method does not require users to adjust any
+    parameters to work and gives them control over the number of levels to 
+    be returned.
 package: SpectralTAD
 output:
     BiocStyle::html_document
@@ -38,7 +38,7 @@ options(width = 400)
 
 # Introduction
 
-`SpectralTAD` is a package designed to allow for fast hierarchical TAD calling on a wide-variety of chromatin conformation capture (Hi-C) data. `SpectralTAD` takes a contact matrix as an input and outputs a BED file containing coordinates corresponding to TAD locations. The package contains two functions, `SpectralTAD()` and `SpectralTAD_Par()` with SpectralTAD being a single-CPU TAD-caller and `SpectralTAD_Par` being the parallelized version. This package provides flexibility in the data it accepts, allowing for $n \times n$ (square numerical matrix), $n \times (n+3)$ (square numerical matrix with the additional chromosome, start, end columns), and 3-column sparse matrices (described below). There are no parameters required for running the functions, though certain methods for customizing the results are available. The idea is to give users the freedom to control how they call TADs while giving them the option to perform it in an unsupervised manner.
+`SpectralTAD` is a package designed to allow for fast hierarchical TAD calling on a wide-variety of chromatin conformation capture (Hi-C) data. `SpectralTAD` takes a contact matrix as an input and outputs a list of data frames or GRange objects in BED format containing coordinates corresponding to TAD locations. The package contains two functions, `SpectralTAD()` and `SpectralTAD_Par()` with SpectralTAD being a single-CPU TAD-caller and `SpectralTAD_Par` being the parallelized version. This package provides flexibility in the data it accepts, allowing for $n \times n$ (square numerical matrix), $n \times (n+3)$ (square numerical matrix with the additional chromosome, start, end columns), and 3-column sparse matrices (described below). There are no parameters required for running the functions, though certain methods for customizing the results are available. The idea is to give users the freedom to control how they call TADs while giving them the option to perform it in an unsupervised manner.
 
 The package is based around the windowed spectral clustering algorithm, introduced by [@cresswell:2019aa] , which is designed to be robust to sparsity, noise, and sequencing depth of Hi-C data. 
 
@@ -139,7 +139,7 @@ head(rao_chr20_25_rep)
 #We see that this is a sparse 3-column contact matrix
 #Running the algorithm with resolution specified
 results = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", resolution = 25000, qual_filter = FALSE, z_clust = FALSE)
-#Printing the bed file
+#Printing the top 5 TADs
 head(results$Level_1, 5)
 #Repeating without specifying resolution
 no_res = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = FALSE)

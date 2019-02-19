@@ -4,10 +4,10 @@
 \alias{SpectralTAD_Par}
 \title{Parallelized Hierarchical Spectral Clustering of TADs}
 \usage{
-SpectralTAD_Par(cont_list, chr, labels = NULL, levels = 1,
-  qual_filter = FALSE, z_clust = TRUE, eigenvalues = 2,
-  min_size = 5, cores = "auto", resolution = "auto",
-  gap_threshold = 1)
+SpectralTAD_Par(cont_list, chr, levels = 1, qual_filter = FALSE,
+  z_clust = TRUE, eigenvalues = 2, min_size = 5,
+  resolution = "auto", grange = FALSE, gap_threshold = 1,
+  cores = "auto", labels = NULL)
 }
 \arguments{
 \item{cont_list}{List of contact matrices where each is in either
@@ -18,9 +18,6 @@ the start point of the corresponding bin. Required.}
 
 \item{chr}{Vector of chromosomes in the same order as their
 corresponding contact matrices. Must be same length as cont_list. Required.}
-
-\item{labels}{Vector of labels used to name each contact matrix. Must be
-same length as cont_list. Default is NULL.}
 
 \item{levels}{The number of levels of the TAD hierarchy to be calculated.
 The default setting is 1.}
@@ -36,20 +33,26 @@ The default and suggested setting is 2.}
 
 \item{min_size}{The minimum allowable TAD size measured in bins. Default is 5.}
 
-\item{cores}{Number of cores to use. Defaults to total available
-cores minus one.}
-
 \item{resolution}{The resolution of the contact matrix. If none selected,
 the resolution is estimated by taking the most common distance between bins.
 For n x (n+3) contact matrices, this value is automatically calculated
 from the first 3 columns.}
 
+\item{grange}{Parameter to determine whether the result should be a 
+GRangeList object. Defaults to FALSE}
+
 \item{gap_threshold}{Corresponds to the percentage of zeros allowed before
 a column/row is removed from analysis. 1=100\%, .7 = 70\%, etc. Default is 1.}
+
+\item{cores}{Number of cores to use. Defaults to total available
+cores minus one.}
+
+\item{labels}{Vector of labels used to name each contact matrix. Must be
+same length as cont_list. Default is NULL.}
 }
 \value{
-List of lists where each entry is a list of bed files corresponding
-to TADs seperated by hierarchies
+List of lists where each entry is a list of data frames or GRanges
+ in BED format corresponding to TADs seperated by hierarchies
 }
 \description{
 Parallelized Hierarchical Spectral Clustering of TADs

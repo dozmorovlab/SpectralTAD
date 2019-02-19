@@ -6,11 +6,11 @@
 \usage{
 SpectralTAD(cont_mat, chr, levels = 1, qual_filter = FALSE,
   z_clust = TRUE, eigenvalues = 2, min_size = 5,
-  resolution = "auto", gap_threshold = 1, GRranges)
+  resolution = "auto", gap_threshold = 1, grange = FALSE)
 }
 \arguments{
 \item{cont_mat}{Contact matrix in either sparse 3 column, n x n or n x (n+3)
-form where the first three columns are a bed file of coordinates.
+form where the first three columns are coordinates in BED format.
 If an x n matrix is used, the column names must correspond to the start
 point of the corresponding bin. Required.}
 
@@ -37,9 +37,12 @@ from the first three columns.}
 
 \item{gap_threshold}{Corresponds to the percentage of zeros allowed before
 a column/row is removed from the analysis. 1=100\%, .7 = 70\%, etc. Default is 1.}
+
+\item{grange}{Parameter to determine whether the result should be a 
+GRangeList object. Defaults to FALSE}
 }
 \value{
-A list where each entry is a bed file corresponding to the level of the hierarchy.
+A list where each entry is in BED format corresponding to the level of the hierarchy.
 }
 \description{
 Hierarchical Spectral Clustering of TADs

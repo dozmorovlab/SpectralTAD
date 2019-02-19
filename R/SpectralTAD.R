@@ -1,8 +1,9 @@
 #' Hierarchical Spectral Clustering of TADs
 #'
 #' @import dplyr
+#' @import magrittr
 #' @param cont_mat Contact matrix in either sparse 3 column, n x n or n x (n+3)
-#' form where the first three columns are a bed file of coordinates.
+#' form where the first three columns are coordinates in BED format.
 #' If an x n matrix is used, the column names must correspond to the start
 #' point of the corresponding bin. Required.
 #' @param chr The chromosome of the contact matrix being analyzed. Required.
@@ -21,7 +22,9 @@
 #' from the first three columns.
 #' @param gap_threshold Corresponds to the percentage of zeros allowed before
 #' a column/row is removed from the analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
-#' @return A list where each entry is a bed file corresponding to the level of the hierarchy.
+#' @param grange Parameter to determine whether the result should be a 
+#' GRangeList object. Defaults to FALSE
+#' @return A list where each entry is in BED format corresponding to the level of the hierarchy.
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix,
 #' or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates
@@ -43,7 +46,7 @@
 
 SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
                        z_clust = TRUE, eigenvalues = 2, min_size = 5, 
-                       resolution = "auto", gap_threshold = 1, GRranges) {
+                       resolution = "auto", gap_threshold = 1, grange = FALSE) {
 
   #Calculate the number of rows and columns of the contact matrix
   
@@ -96,7 +99,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     #Remove bed file portion
 
-    cont_mat = as.matrix(cont_mat[,-c(1:3)])
+    cont_mat = as.matrix(cont_mat[,-c(seq_len(3))])
 
     if (all(is.finite(cont_mat)) == FALSE) {
       stop("Contact matrix must only contain real numbers")
@@ -186,7 +189,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = TRUE, min_size = min_size)
     })
 
-  #Create a bed file for sub-TADs
+  #Convert sub-TADs to BED format
 
   called_tads[[curr_lev]] = bind_rows(sub_tads, pres_tads) %>% mutate(Level = curr_lev) %>% arrange(start)
 
@@ -196,7 +199,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
   #Assign names based on levels
 
-  names(called_tads) = paste0("Level_", 1:levels)
+  names(called_tads) = paste0("Level_", seq_len(levels))
+  
+  if (grange == TRUE) {
+    called_tads = lapply(called_tads, function(x) {
+      GRanges(x)
+    })
+    called_tads = GRangesList(called_tads)
+  }
 
   return(called_tads)
 }

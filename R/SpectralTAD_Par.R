@@ -8,8 +8,6 @@
 #' the start point of the corresponding bin. Required.
 #' @param chr Vector of chromosomes in the same order as their
 #' corresponding contact matrices. Must be same length as cont_list. Required.
-#' @param labels Vector of labels used to name each contact matrix. Must be
-#' same length as cont_list. Default is NULL.
 #' @param levels The number of levels of the TAD hierarchy to be calculated.
 #' The default setting is 1.
 #' @param qual_filter Option to turn on quality filtering which removes TADs
@@ -25,11 +23,15 @@
 #' from the first 3 columns.
 #' @param gap_threshold Corresponds to the percentage of zeros allowed before
 #' a column/row is removed from analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
+#' @param grange Parameter to determine whether the result should be a 
+#' GRangeList object. Defaults to FALSE
 #' @param cores Number of cores to use. Defaults to total available
 #' cores minus one.
+#' @param labels Vector of labels used to name each contact matrix. Must be
+#' same length as cont_list. Default is NULL.
 #' @export
-#' @return List of lists where each entry is a list of bed files corresponding
-#' to TADs seperated by hierarchies
+#' @return List of lists where each entry is a list of data frames or GRanges
+#'  in BED format corresponding to TADs seperated by hierarchies
 #' @details This is the parallelized version of the SpectralTAD() function.
 #' Given a sparse 3 column, an n x n contact matrix,
 #' or n x (n+3) contact matrix, SpectralTAD returns a list of TAD coordinates
@@ -53,10 +55,19 @@
 #' labels = c("run1", "run2")
 #' spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels)
 
-SpectralTAD_Par = function(cont_list, chr, labels = NULL, levels = 1,
+SpectralTAD_Par = function(cont_list, chr, levels = 1,
                            qual_filter = FALSE, z_clust = TRUE, eigenvalues = 2,
-                           min_size =5, cores = "auto",
-                           resolution = "auto", gap_threshold = 1) {
+                           min_size =5,
+                           resolution = "auto", grange = FALSE, gap_threshold = 1, cores = "auto", labels = NULL) {
+
+  if ( (is.data.frame(cont_list)) | (is.matrix(cont_list))) {
+    stop("Input must be list of contact matrices")
+  }
+  
+  if (length(chr) != length(cont_list)) {
+    stop("Length of chromosome vector must match number of contact matrices")
+  }
+  
 
   if (cores == "auto") {
   # Check how many cores you have
@@ -78,12 +89,12 @@ SpectralTAD_Par = function(cont_list, chr, labels = NULL, levels = 1,
 
   bed = BiocParallel::bplapply(seq_len(length(cont_list)), function(x, spec_fun, cont_list,
                                                              eigenvalues, z_clust, qual_filter, levels, min_size,
-                                                             chr, gap_threshold) spec_fun(cont_mat = cont_list[[x]],
+                                                             chr, gap_threshold, grange) spec_fun(cont_mat = cont_list[[x]],
                                                              chr[[x]], levels = levels, qual_filter = qual_filter,
                                                              z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size),
                                                              spec_fun = SpectralTAD, cont_list = cont_list, eigenvalues = eigenvalues,
                                                              min_size = min_size, levels = levels,z_clust = z_clust, qual_filter = qual_filter,
-                                                             chr = chr, gap_threshold = gap_threshold)
+                                                             chr = chr, gap_threshold = gap_threshold, grange = grange)
 
   #Assign labels to identify each contact matrix
 
