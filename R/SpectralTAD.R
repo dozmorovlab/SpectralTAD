@@ -51,9 +51,6 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   #Calculate the number of rows and columns of the contact matrix
   
   #Check for matrix and convert if not
-  if (!is.matrix(cont_mat)) {
-    cont_mat = as.matrix(cont_mat)
-  }
   
   if (missing("chr")) {
     stop("Must specify chromosome")
@@ -69,6 +66,10 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   }
 
   if (col_test == 3) {
+    
+    if (!is.matrix(cont_mat)) {
+      cont_mat = as.matrix(cont_mat)
+    }
 
     #Convert sparse matrix to n x n matrix
 

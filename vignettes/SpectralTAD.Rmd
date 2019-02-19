@@ -5,6 +5,7 @@ author:
   affiliation:
   - &1 Department of Biostatistics, Virginia Commonwealth University, Richmond, VA
 - name: John Stansfield
+  affiliation:
   - *1
 - name: Mikhail Dozmorov
   affiliation:
@@ -138,11 +139,11 @@ data("rao_chr20_25_rep")
 head(rao_chr20_25_rep)
 #We see that this is a sparse 3-column contact matrix
 #Running the algorithm with resolution specified
-results = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", resolution = 25000, qual_filter = FALSE, z_clust = FALSE)
+results = SpectralTAD(rao_chr20_25_rep, chr = "chr20", resolution = 25000, qual_filter = FALSE, z_clust = FALSE)
 #Printing the top 5 TADs
 head(results$Level_1, 5)
 #Repeating without specifying resolution
-no_res = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = FALSE)
+no_res = SpectralTAD(rao_chr20_25_rep, chr = "chr20", qual_filter = FALSE, z_clust = FALSE)
 #We can see below that resolution can be estimated automatically if necessary
 identical(results, no_res)
 ```
@@ -155,7 +156,7 @@ One method for filtering TADs is using group-wise silhouette scores. This is don
 
 ```{r, message = FALSE}
 #Running SpectralTAD with silhouette score filtering
-qual_filt = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = TRUE, z_clust = FALSE, resolution = 25000)
+qual_filt = SpectralTAD(rao_chr20_25_rep, chr = "chr20", qual_filter = TRUE, z_clust = FALSE, resolution = 25000)
 #Showing quality filtered results
 head(qual_filt$Level_1,5)
 #Quality filtering generally has different dimensions
@@ -170,9 +171,9 @@ The results when using the quality filtering option are altered to include a new
 Z-score filtering is based on observations about the log-normality of the distance between eigenvector gaps from [@cresswell:2019aa]. Z-score filtering bypasses the uses of silhouette score and defines a TAD boundary as the area between consecutive regions where the z-score of the eigenvector gap is greater than 2.  
 
 ```{r, message = FALSE}
-z_filt = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", qual_filter = FALSE, z_clust = TRUE, resolution = 25000)
+z_filt = SpectralTAD(rao_chr20_25_rep, chr = "chr20", qual_filter = FALSE, z_clust = TRUE, resolution = 25000)
 head(z_filt$Level_1, 5)
-dim(z_filt)
+dim(z_filt$Level_1)
 ```
 
 We can see that TADs found using this method are generally more fine than those found using the silhouette score based filtering. Z-score filtering is more suited for people not interested in TAD hierarchies because the initial TADs detected are less broad than those by quality filtering. 
@@ -183,7 +184,7 @@ Our method is specifically designed to find hierarchical TADs. To do so, users m
 
 ```{r, message = FALSE}
 #Running SpectralTAD with 3 levels and no quality filtering
-spec_hier = SpectralTAD(as.matrix(rao_chr20_25_rep), chr = "chr20", resolution = 25000, qual_filter = FALSE, levels = 3)
+spec_hier = SpectralTAD(rao_chr20_25_rep, chr = "chr20", resolution = 25000, qual_filter = FALSE, levels = 3)
 #Level 1 remains unchanged
 head(spec_hier$Level_1,5)
 #Level 2 contains the sub-TADs for level 1
@@ -205,7 +206,7 @@ It is sometimes the case that people want to run SpectralTAD on multiple chromos
 
 ```{r, eval = FALSE}
 #Creating replicates of our HiC data for demonstration
-cont_list = replicate(3,as.matrix(rao_chr20_25_rep), simplify = FALSE)
+cont_list = replicate(3,rao_chr20_25_rep, simplify = FALSE)
 #Creating a vector of chromosomes
 chr_over = c("chr20", "chr20", "chr20")
 #Creating a list of labels
