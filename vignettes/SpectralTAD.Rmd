@@ -107,12 +107,27 @@ The cooler software can be downloaded from http://cooler.readthedocs.io/en/lates
 3. Run the code below
 
 ```{r, eval = FALSE}
+#If a single chromosome .cooler file
+
 #Read in data
 cool_mat = read.table("Rao.GM12878.50kb.txt")
 #Convert to sparse 3-column matrix using cooler2sparse from HiCcompare
 sparse_mat = HiCcompare::cooler2sparse(cool_mat)
 #Run SpectralTAD
 spec_tad = SpectralTAD(sparse_mat, chr = "chr20")
+
+#If a multiple chromosome .cooler file
+
+#Read in data
+cool_mat = read.table("Rao.GM12878.50kb.txt")
+#Convert to sparse 3-column matrix using cooler2sparse from HiCcompare
+sparse_mats = HiCcompare::cooler2sparse(cool_mat)
+#Run SpectralTAD
+spec_tads = lapply(names(sparse_mats), function(x) {
+  print(x)
+  SpectralTAD(sparse_mats[[x]], chr = x, z_clust = TRUE)
+})
+
 ```
 
 #### Working with HiC-Pro files
@@ -123,10 +138,17 @@ HiC-Pro data comes with 2 files, the `.matrix` file and the `.bed` file. The `.m
 #Read in both files
 mat = read.table("Rao.GM12878.50kb.matrix")
 bed = read.table("Rao.GM12878.50kb.bed")
-#Convert to traditional three column matrix with coordinates
-sparse_mat = HiCcompare::hicpro2bedpe(mat, bed)
-#Run SpectralTAD
-SpectralTAD(sparse_mat, chr = "chr20")
+#Convert to modified bed format
+sparse_mats = hicpro2bedpe(mats,bed)
+#Go through all matrices
+sparse_tads = lapply(sparse_mats$cis, function(x) {
+  #Pull out chromosome
+  chr = x[,1][1]
+  #Subset to make three column matrix
+  x = x[,c(2,5,7)]
+  #Run SpectralTAD
+  SpectralTAD(x, chr=chr)
+})
 ```
 
 ## Running SpectralTAD

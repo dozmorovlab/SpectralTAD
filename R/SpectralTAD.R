@@ -123,6 +123,10 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
       resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-lag(as.numeric(colnames(cont_mat)))))[1])
   }
+  
+  if (resolution>200000) {
+    stop("Resolution must be higher than 200kb")
+  }
 
   #Performed window spectral clustering
 
