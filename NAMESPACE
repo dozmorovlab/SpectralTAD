@@ -2,6 +2,7 @@
 
 export(SpectralTAD)
 export(SpectralTAD_Par)
+import(GenomicRanges)
 import(dplyr)
 import(magrittr)
 importFrom(BiocParallel,MulticoreParam)

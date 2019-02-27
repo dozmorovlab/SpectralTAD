@@ -2,6 +2,7 @@
 #'
 #' @import dplyr
 #' @import magrittr
+#' @import GenomicRanges
 #' @param cont_mat Contact matrix in either sparse 3 column, n x n or n x (n+3)
 #' form where the first three columns are coordinates in BED format.
 #' If an x n matrix is used, the column names must correspond to the start
@@ -215,9 +216,9 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   
   if (grange == TRUE) {
     called_tads = lapply(called_tads, function(x) {
-      GRanges(x)
+      GenomicRanges::GRanges(x)
     })
-    called_tads = GRangesList(called_tads)
+    called_tads = GenomicRanges::GRangesList(called_tads)
   }
 
   return(called_tads)

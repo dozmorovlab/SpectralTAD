@@ -25,7 +25,8 @@ Imports:
     parallel,
     BiocParallel,
     magrittr,
-    HiCcompare
+    HiCcompare,
+    GenomicRanges
 Suggests: 
     BiocCheck,
     BiocManager,
