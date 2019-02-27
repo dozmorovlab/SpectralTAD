@@ -75,6 +75,9 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     message("Converting to n x n matrix")
 
+    if (nrow(cont_mat) == 1) {
+      stop("Matrix is too small to convert to full")
+    }
     cont_mat = HiCcompare::sparse2full(cont_mat)
 
     if (all(is.finite(cont_mat)) == FALSE) {
@@ -126,6 +129,10 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   
   if (resolution>200000) {
     stop("Resolution must be higher than 200kb")
+  }
+  
+  if (nrow(cont_mat) < 2000000/resolution) {
+    stop("Matrix must be larger than 2 megabases divided by resolution")
   }
 
   #Performed window spectral clustering
@@ -257,7 +264,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     #Subset matrix based on window size
 
-    sub_filt = cont_mat[start:end, start:end]
+    sub_filt = cont_mat[seq(start,end, 1), seq(start,end, 1)]
 
     zero_thresh = round(nrow(sub_filt)*(gap_threshold))
     non_gaps_within = which((colSums(sub_filt == 0))<zero_thresh)
@@ -267,12 +274,22 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     if (length(nrow(sub_filt)) == 0) {
       start = end
       end = start+window_size
+      
+      if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
+        end = nrow(cont_mat)
+        
+      }
       next
     }
     
     if (nrow(sub_filt) < min_size*2) {
       start = end
       end = start+window_size
+      
+      if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
+        end = nrow(cont_mat)
+        
+      }
       next
     }
 
@@ -366,7 +383,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       #Create TADs using significant boundaries
 
       TAD_start = c(1, sig_bounds+1)
-
+      
       TAD_end = c(sig_bounds, nrow(sub_filt))
 
       widths = (TAD_end-TAD_start)+1
