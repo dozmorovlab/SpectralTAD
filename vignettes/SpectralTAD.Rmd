@@ -136,14 +136,15 @@ HiC-Pro data comes with 2 files, the `.matrix` file and the `.bed` file. The `.m
 
 ```{r, eval = FALSE}
 #Read in both files
-mat = read.table("Rao.GM12878.50kb.matrix")
-bed = read.table("Rao.GM12878.50kb.bed")
+mat = read.table("amyg_100000.matrix")
+bed = read.table("amyg_100000_abs.bed")
 #Convert to modified bed format
-sparse_mats = hicpro2bedpe(mats,bed)
+sparse_mats = HiCcompare::hicpro2bedpe(mat,bed)
 #Go through all matrices
 sparse_tads = lapply(sparse_mats$cis, function(x) {
   #Pull out chromosome
   chr = x[,1][1]
+  print(chr)
   #Subset to make three column matrix
   x = x[,c(2,5,7)]
   #Run SpectralTAD
