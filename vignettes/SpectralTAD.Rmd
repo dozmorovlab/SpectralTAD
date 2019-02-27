@@ -103,14 +103,17 @@ Users can also find TADs from data output by `cooler` (http://cooler.readthedocs
 The cooler software can be downloaded from http://cooler.readthedocs.io/en/latest/index.html. It essentially provides access to a catalog of popular HiC datasets. We can pre-process and use .cool files that are associated with cooler files using the following steps:
 
 1. Download `.cool` file from (ftp://cooler.csail.mit.edu/coolers)
-2. Convert to text file using `cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool > Rao.GM12878.50kb.txt` 
-3. Run the code below
+2. Convert to text file using `cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool > Rao.GM12878.50kb.txt`
+3. If necessary remove any empty matrices
+4. Run the code below
 
 ```{r, eval = FALSE}
 #Read in data
 cool_mat = read.table("Rao.GM12878.50kb.txt")
 #Convert to sparse 3-column matrix using cooler2sparse from HiCcompare
 sparse_mats = HiCcompare::cooler2sparse(cool_mat)
+#Remove empty matrices
+sparse_mats = sparse_mats$cis[sapply(sparse_mats, nrow) != 0]
 #Run SpectralTAD
 spec_tads = lapply(names(sparse_mats), function(x) {
   SpectralTAD(sparse_mats[[x]], chr = x)
@@ -128,6 +131,8 @@ mat = read.table("amyg_100000.matrix")
 bed = read.table("amyg_100000_abs.bed")
 #Convert to modified bed format
 sparse_mats = HiCcompare::hicpro2bedpe(mat,bed)
+#Remove empty matrices
+sparse_mats$cis = sparse_mats$cis[sapply(sparse_mats, nrow) != 0]
 #Go through all matrices
 sparse_tads = lapply(sparse_mats$cis, function(x) {
   #Pull out chromosome
