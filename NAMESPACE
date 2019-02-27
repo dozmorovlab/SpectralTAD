@@ -2,10 +2,11 @@
 
 export(SpectralTAD)
 export(SpectralTAD_Par)
-import(GenomicRanges)
 import(dplyr)
 import(magrittr)
 importFrom(BiocParallel,MulticoreParam)
 importFrom(BiocParallel,SnowParam)
 importFrom(BiocParallel,bplapply)
 importFrom(BiocParallel,register)
+importFrom(GenomicRanges,GRanges)
+importFrom(GenomicRanges,GRangesList)
