@@ -266,15 +266,25 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     sub_filt = cont_mat[seq(start,end, 1), seq(start,end, 1)]
 
+    #Remove columns and rows with % zeros higher than threshold
     zero_thresh = round(nrow(sub_filt)*(gap_threshold))
     non_gaps_within = which((colSums(sub_filt == 0))<zero_thresh)
 
+    #Subset based on gaps
     sub_filt = sub_filt[non_gaps_within, non_gaps_within]
     
+    #If matrix is empty then move window
     if (length(nrow(sub_filt)) == 0) {
       start = end
       end = start+window_size
       
+      #If the new end is same as start end while loop
+      if (start == nrow(cont_mat)) {
+        end_loop = 1
+        next
+      }
+      
+      #If window overlaps with end of matrix make it move to last column
       if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
         end = nrow(cont_mat)
         
@@ -282,9 +292,16 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       next
     }
     
+    #Ignore if sub matrix if too small
     if (nrow(sub_filt) < min_size*2) {
       start = end
       end = start+window_size
+    
+      #If we reach the end of the matrix then end  
+      if (start == nrow(cont_mat)) {
+        end_loop = 1
+        next
+      }
       
       if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
         end = nrow(cont_mat)
