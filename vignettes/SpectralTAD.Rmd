@@ -107,25 +107,13 @@ The cooler software can be downloaded from http://cooler.readthedocs.io/en/lates
 3. Run the code below
 
 ```{r, eval = FALSE}
-#If a single chromosome .cooler file
-
-#Read in data
-cool_mat = read.table("Rao.GM12878.50kb.txt")
-#Convert to sparse 3-column matrix using cooler2sparse from HiCcompare
-sparse_mat = HiCcompare::cooler2sparse(cool_mat)
-#Run SpectralTAD
-spec_tad = SpectralTAD(sparse_mat, chr = "chr20")
-
-#If a multiple chromosome .cooler file
-
 #Read in data
 cool_mat = read.table("Rao.GM12878.50kb.txt")
 #Convert to sparse 3-column matrix using cooler2sparse from HiCcompare
 sparse_mats = HiCcompare::cooler2sparse(cool_mat)
 #Run SpectralTAD
 spec_tads = lapply(names(sparse_mats), function(x) {
-  print(x)
-  SpectralTAD(sparse_mats[[x]], chr = x, z_clust = TRUE)
+  SpectralTAD(sparse_mats[[x]], chr = x)
 })
 
 ```
@@ -144,7 +132,6 @@ sparse_mats = HiCcompare::hicpro2bedpe(mat,bed)
 sparse_tads = lapply(sparse_mats$cis, function(x) {
   #Pull out chromosome
   chr = x[,1][1]
-  print(chr)
   #Subset to make three column matrix
   x = x[,c(2,5,7)]
   #Run SpectralTAD
