@@ -17,6 +17,9 @@
 #' @param eigenvalues The number of eigenvectors to be calculated.
 #' The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Default is 5.
+#' @param window_size The size of the sliding window for calculating TADs.
+#' Smaller window sizes correspond to less noise from long-range contacts
+#' but limit the possible size of TADs
 #' @param resolution The resolution of the contact matrix. If none selected,
 #' the resolution is estimated by taking the most common distance between bins.
 #' For n x (n+3) contact matrices, this value is automatically calculated
@@ -46,7 +49,8 @@
 
 
 SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
-                       z_clust = TRUE, eigenvalues = 2, min_size = 5, 
+                       z_clust = FALSE, eigenvalues = 2, min_size = 5,
+                       window_size = 25,
                        resolution = "auto", gap_threshold = 1, grange = FALSE) {
 
   #Calculate the number of rows and columns of the contact matrix
@@ -138,7 +142,11 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
   #Performed window spectral clustering
 
-  bed = .windowedSpec(cont_mat, chr = chr, resolution = resolution, z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size, qual_filter = qual_filter, gap_threshold = gap_threshold) %>% mutate(Level = 1)
+  bed = .windowedSpec(cont_mat, chr = chr, resolution = resolution, 
+                      z_clust = z_clust, eigenvalues = eigenvalues, 
+                      min_size = min_size, window_size = window_size,
+                      qual_filter = qual_filter, gap_threshold = gap_threshold) %>% 
+    mutate(Level = 1)
 
   #Calculate the end point of TADs based on bin instead of genomic coordinate
 
@@ -231,11 +239,16 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 #Used within SpectralTAD
 
 .windowedSpec = function(cont_mat, resolution, chr,
-                        gap_filter = TRUE,z_clust = FALSE,  qual_filter = TRUE, eigenvalues = 2, min_size = 5, gap_threshold = 1) {
+                        gap_filter = TRUE,z_clust = FALSE,  qual_filter = TRUE, 
+                        eigenvalues = 2, min_size = 5, 
+                        window_size = ceiling(2000000/resolution), 
+                        gap_threshold = 1 
+                        
+) {
 
   #Set window sized based on biologically maximum TAD size of 2000000
-
-  window_size = ceiling(2000000/resolution)
+  
+  window_size = ceiling(window_size)
 
   #Find all regions which aren't completely zero and remove those that are
 

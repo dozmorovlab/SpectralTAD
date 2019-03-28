@@ -56,9 +56,13 @@
 #' spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels)
 
 SpectralTAD_Par = function(cont_list, chr, levels = 1,
-                           qual_filter = FALSE, z_clust = TRUE, eigenvalues = 2,
+                           qual_filter = FALSE, 
+                           z_clust = FALSE, 
+                           eigenvalues = 2,
                            min_size =5,
-                           resolution = "auto", grange = FALSE, gap_threshold = 1, cores = "auto", labels = NULL) {
+                           resolution = "auto", grange = FALSE, 
+                           gap_threshold = 1, cores = "auto", 
+                           labels = NULL) {
 
   if ( (is.data.frame(cont_list)) | (is.matrix(cont_list))) {
     stop("Input must be list of contact matrices")
