@@ -1,5 +1,7 @@
 # SpectralTAD
 
+[![Build Status](https://travis-ci.org/cresswellkg/SpectralTAD.svg?branch=master)](https://travis-ci.org/cresswellkg/SpectralTAD)
+
 `SpectralTAD` is a TAD caller that uses a modified form of spectral clustering 
 to quickly identify hierarchical topologically associating domains (TADs). 
 Users input a contact matrix and receive a [BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) file 
