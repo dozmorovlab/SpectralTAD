@@ -28,6 +28,11 @@
 #' a column/row is removed from the analysis. 1=100\%, .7 = 70\%, etc. Default is 1.
 #' @param grange Parameter to determine whether the result should be a 
 #' GRangeList object. Defaults to FALSE
+#' @param out_format Specifies the format of the file which SpectralTAD outputs. If
+#' "none, no file is output. "juicebox" or "bedpe" returns a bedpe file 
+#' compatible with juicebox. "hicexplorer" or "bed" returns a bed file compatible with 
+#'  hicexplorer. Default is none
+#' @param out_path Path of output file. Default is the chromosome
 #' @return A list where each entry is in BED format corresponding to the level of the hierarchy.
 #' @export
 #' @details Given a sparse 3 column, an n x n contact matrix,
@@ -51,7 +56,8 @@
 SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
                        z_clust = FALSE, eigenvalues = 2, min_size = 5,
                        window_size = 25,
-                       resolution = "auto", gap_threshold = 1, grange = FALSE) {
+                       resolution = "auto", gap_threshold = 1, 
+                       grange = FALSE, out_format = "none", out_path = chr) {
 
   #Calculate the number of rows and columns of the contact matrix
   
@@ -221,6 +227,34 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   #Assign names based on levels
 
   names(called_tads) = paste0("Level_", seq_len(levels))
+  
+  if ( !(out_format == "none")) {
+    if (out_format %in% c("bedpe", "juicebox")) {
+      #Get just coordinates
+      bed_out = bind_rows(called_tads) %>% 
+        dplyr::select(chr,start,end)
+      #Combine into first six columns of bedpe and add extra columns
+      bed_out = bind_cols(bed_out, bed_out) %>% 
+        mutate(name = ".", score = ".", strand1 =".", strand2 = ".")
+      #Binding tads for color assignment
+      bound_tads = bind_rows(called_tads)
+      #Create vector of colors
+      colors = c("0,0,0", "255,0,0", "0,255,0", "0,0,255")
+      #Assign colors
+      bed_out = bed_out %>% 
+        mutate(color =colors[bound_tads$Level])
+      
+      write.table(bed_out, out_path, quote = FALSE,
+                  row.names = FALSE, sep = "\t", col.names = FALSE)
+    } else if (out_format %in% c("bed", "hicexplorer")) {
+      bed_out = bind_rows(called_tads) %>% dplyr::select(chr,start,end)
+      write.table(bed_out, out_path, quote = FALSE,
+                  row.names = FALSE, sep = "\t", col.names = FALSE)
+    } else {
+      warning("No file output, unsupported output format chosen")
+    }
+    
+  }
   
   if (grange == TRUE) {
     called_tads = lapply(called_tads, function(x) {
@@ -644,6 +678,6 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>% dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%dplyr::filter((end-start)/resolution >= min_size) %>% dplyr::arrange(start)
     }
   }
-
+   
   return(bed)
 }
