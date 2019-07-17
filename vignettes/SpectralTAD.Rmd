@@ -260,4 +260,41 @@ microbenchmark(quality_filter = SpectralTAD(cont_mat = n_n, chr = "chr20", qual_
 
 As can be seen using the z-score method is the fastest.
 
+## Using SpectralTAD output with HiCExplorer and Juicebox
+
+SpectralTAD is designed to work in tandem with Juicebox (http://www.aidenlab.org/juicebox/) and HiCExplorer (https://hicexplorer.usegalaxy.eu/), two popular TAD visualization tools. Users may output files, corresponding to either tools.
+
+### Using SpectralTAD with HiCExplorer
+
+HiCExplorer takes simple bed files. To use SpectralTAD with HiCExplorer, do the following:
+
+```{r, eval = FALSE}
+#Get contact matrix
+data("rao_chr20_25_rep")
+head(rao_chr20_25_rep)
+#Run spectral TAD with output format "hicexplorer" or "bed" and specify the path
+spec_hier = SpectralTAD(rao_chr20_25_rep, chr = "chr20", resolution = 25000, qual_filter = FALSE, levels = 3, out_format = "hicexplorer", out_path = "chr20.bed")
+
+```
+
+This code will output a three-column bed file with TAD coordinates for all three levels. hicPlotTADs from HiCExplorer takes a .ini configuration file. To use SpectralTAD results you simply just have to set the output file as the directory under the [tads] subheading. For a full walk-through see (https://hicexplorer.readthedocs.io/en/latest/content/tools/hicPlotTADs.html#id4) under the heading "Configuration file template."
+
+### Using SpectralTAD with Juicebox
+
+Juicebox takes bedpe files as its primary file type. To use SpectralTAD with Juicebox, do the following:
+
+```{r, eval = FALSE}
+#Get contact matrix
+data("rao_chr20_25_rep")
+head(rao_chr20_25_rep)
+#Run spectral TAD with output format "hicexplorer" or "bed" and specify the path
+spec_hier = SpectralTAD(rao_chr20_25_rep, chr = "chr20", resolution = 25000, qual_filter = FALSE, levels = 3, out_format = "juicebox", out_path = "chr20.bedpe")
+
+```
+
+The output for this code is an 11-column bedpe file, which is formatted to work for Juicebox. To use the file, you must first select a HiC matrix in the Juicebox interface (https://www.aidenlab.org/juicebox/). This is done by choosing `Load Map -> Select File -> Select Contact Map`. This data corresponds to `Rao and Huntley et al. | Cell 2014 GM12878 (human) in situ ENCODE Batch 1 HIC048` so we select this. Alternatively, you can upload your own hic matrix in .hic or .cool format. To select the TADs called by `SpectralTAD` simply choose `Load Tracks -> Local Track File -> Choose File -> chr20.bedpe`. To view chromosome 20 specifically, select `≡ -> Chromosomes -> chr20`.
+
+
+
+
 # References
