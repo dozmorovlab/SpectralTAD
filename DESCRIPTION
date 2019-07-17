@@ -16,7 +16,7 @@ Description:
     the number of hierarchical levels to be returned.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 6.1.2
+RoxygenNote: 6.1.1
 Imports: 
     dplyr,
     PRIMME,
