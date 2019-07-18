@@ -95,12 +95,27 @@ chr20  675000 1200000     2
 chr20 1200000 1750000     2
 ```
 
+## Citation
+
+Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. 2019. “SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering,” February. Cold Spring Harbor Laboratory. https://doi.org/10.1101/549170.
+
+```
+@Article{Cresswell:2019aa,
+  author    = {Kellen G. Cresswell and John C. Stansfield and Mikhail G. Dozmorov},
+  title     = {{SpectralTAD}: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering},
+  year      = {2019},
+  month     = {feb},
+  doi       = {10.1101/549170},
+  publisher = {Cold Spring Harbor Laboratory},
+}
+```
+
 ## Contributions & Support
 
 Suggestions for new features and bug reports are welcome. Please, create a new 
 issue for any of these or contact the author directly: 
-@cresswellkg (cresswellkg@vcu.edu)
+@cresswellkg (cresswellkg[at]vcu[dot]edu)
 
 ## Contributors
 
-Authors: @cresswellkg (cresswellkg@vcu.edu) & @mdozmorov (mikhail.dozmorov@vcuhealth.org)
+Authors: @cresswellkg (cresswellkg[at]vcu[dot]edu) & @mdozmorov (mikhail.dozmorov[at]vcuhealth[dot]org)
