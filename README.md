@@ -3,7 +3,6 @@
   [![BioC status](http://www.bioconductor.org/shields/build/release/bioc/SpectralTAD.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/SpectralTAD)
   [![Build Status](https://travis-ci.org/cresswellkg/SpectralTAD.svg?branch=master)](https://travis-ci.org/cresswellkg/SpectralTAD)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![Launch binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/cresswellkg/SpectralTAD/master)
 [![Codecov test coverage](https://codecov.io/gh/cresswellkg/SpectralTAD/branch/master/graph/badge.svg)](https://codecov.io/gh/cresswellkg/SpectralTAD?branch=master)
 <!-- badges: end -->
 
