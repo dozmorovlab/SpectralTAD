@@ -6,7 +6,9 @@
 #' @param cont_mat Contact matrix in either sparse 3 column, n x n or n x (n+3)
 #' form where the first three columns are coordinates in BED format.
 #' If an x n matrix is used, the column names must correspond to the start
-#' point of the corresponding bin. Required.
+#' point of the corresponding bin. If large mode is selected, then
+#' this matrix must be a tab-seperated n x n or n x (n+3) and it should be the 
+#' path to a contact matrix. Required.
 #' @param chr The chromosome of the contact matrix being analyzed. Required.
 #' @param levels The number of levels of the TAD hierarchy to be calculated.
 #' The default setting is 1.
@@ -56,12 +58,11 @@
 SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
                        z_clust = FALSE, eigenvalues = 2, min_size = 5,
                        window_size = 25,
-                       resolution = "auto", gap_threshold = 1, 
+                       resolution = "auto", gap_threshold = 1,
                        grange = FALSE, out_format = "none", out_path = chr) {
 
   #Calculate the number of rows and columns of the contact matrix
-  
-  #Check for matrix and convert if not
+
   
   if (missing("chr")) {
     stop("Must specify chromosome")
@@ -244,10 +245,15 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       bed_out = bed_out %>% 
         mutate(color =colors[bound_tads$Level])
       
+      bed_out = bed_out %>% mutate(start = format(start, scientific = FALSE), end = format(end, scientific = FALSE), 
+                                   start1 = format(start1, scientific = FALSE), end1 = format(end1, scientific = FALSE))
       write.table(bed_out, out_path, quote = FALSE,
                   row.names = FALSE, sep = "\t", col.names = FALSE)
     } else if (out_format %in% c("bed", "hicexplorer")) {
-      bed_out = bind_rows(called_tads) %>% dplyr::select(chr,start,end)
+      bed_out = bind_rows(called_tads) %>% 
+        dplyr::select(chr,start,end) %>% 
+        mutate(start = format(start, scientific = FALSE), 
+               end = format(end, scientific = FALSE))
       write.table(bed_out, out_path, quote = FALSE,
                   row.names = FALSE, sep = "\t", col.names = FALSE)
     } else {
