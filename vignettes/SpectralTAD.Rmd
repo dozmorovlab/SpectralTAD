@@ -289,7 +289,6 @@ data("rao_chr20_25_rep")
 head(rao_chr20_25_rep)
 #Run spectral TAD with output format "hicexplorer" or "bed" and specify the path
 spec_hier = SpectralTAD(rao_chr20_25_rep, chr = "chr20", resolution = 25000, qual_filter = FALSE, levels = 3, out_format = "juicebox", out_path = "chr20.bedpe")
-
 ```
 
 The output for this code is an 11-column bedpe file, which is formatted to work for Juicebox. To use the file, you must first select a HiC matrix in the Juicebox interface (https://www.aidenlab.org/juicebox/). This is done by choosing `Load Map -> Select File -> Select Contact Map`. This data corresponds to `Rao and Huntley et al. | Cell 2014 GM12878 (human) in situ ENCODE Batch 1 HIC048` so we select this. Alternatively, you can upload your own hic matrix in .hic or .cool format. To select the TADs called by `SpectralTAD` simply choose `Load Tracks -> Local Track File -> Choose File -> chr20.bedpe`. To view chromosome 20 specifically, select `≡ -> Chromosomes -> chr20`.
