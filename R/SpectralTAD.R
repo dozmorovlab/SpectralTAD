@@ -140,7 +140,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   }
   
   if (resolution>200000) {
-    stop("Resolution must be higher than 200kb")
+    stop("Resolution must be less than (or equal to) 200kb")
   }
   
   if (nrow(cont_mat) < 2000000/resolution) {
