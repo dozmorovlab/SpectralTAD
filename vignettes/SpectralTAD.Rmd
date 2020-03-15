@@ -96,8 +96,23 @@ head(HiCcompare::full2sparse(rao_chr20_25_rep), 5)
 
 ### Working with other data types
 
-Users can also find TADs from data output by `cooler` (http://cooler.readthedocs.io/en/latest/index.html) and HiC-Pro (https://github.com/nservant/HiC-Pro) with minor pre-processing using the `HiCcompare` package. 
+Users can also find TADs from data output by `juicer` (https://github.com/aidenlab/juicer, .hic format), `cooler` (http://cooler.readthedocs.io/en/latest/index.html, .cool format), and HiC-Pro (https://github.com/nservant/HiC-Pro, .matrix and .bed formats) with minor pre-processing using the `HiCcompare` package. 
 
+####  Working with .hic files
+
+Sparse matrices can be extracted from .hic files using the `straw` tool [https://github.com/theaidenlab/straw](https://github.com/theaidenlab/straw). See examples on how to use `straw` at [https://github.com/theaidenlab/straw/wiki/CPP#running](https://github.com/theaidenlab/straw/wiki/CPP#running). Briefly, `straw` requires several inputs for the extraction of data from a `.hic` file:
+
+`<NONE/VC/VC_SQRT/KR> <hicFile(s)> <chr1>[:x1:x2] <chr2>[:y1:y2] <BP/FRAG> <binsize>`
+
+The first field indicates the type of normalization to be applied. The Vanilla Coverage (VC), the square root of Vanilla Coverage (VC_SQRT), and Knight-Ruiz (KR) normalization techniques are available to be applied to the contact maps. Alternatively, the raw contact maps can be extracted using the NONE option (recommended for SpectralTAD). 
+
+The second field is the file name of the `.hic` file to be extracted. The following two fields are the chromosome numbers for the contact map desired, i.e., for the intrachromosomal map of chr1 the user would enter 1 1 in these fields. The next field determines if basepairs or restriction fragment resolution files will be returned. Typically, the user will want to use the `BP` option. The final field specifies the resolution of the contact map. 
+
+For example, to extract the raw matrix corresponding to chromosome 22 at 500kb resolution from the `GSE63525_K562_combined_30.hic` file, we would use the following command:
+
+`./straw NONE GSE63525_K562_combined_30.hic  22 22 BP 500000 > K562.chr22.500kb.txt`
+
+This will extract the data from the `.hic` file and save it to the `K562.chr22.500kb.txt` text file, in the sparse upper triangular matrix format. Typically, chromosome-specific matrices are saved in separate files. 
 #### Working with .cool files
 
 The cooler software can be downloaded from http://cooler.readthedocs.io/en/latest/index.html. It essentially provides access to a catalog of popular HiC datasets. We can pre-process and use .cool files that are associated with cooler files using the following steps:
