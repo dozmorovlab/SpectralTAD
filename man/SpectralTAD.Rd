@@ -4,15 +4,29 @@
 \alias{SpectralTAD}
 \title{Hierarchical Spectral Clustering of TADs}
 \usage{
-SpectralTAD(cont_mat, chr, levels = 1, qual_filter = FALSE,
-  z_clust = TRUE, eigenvalues = 2, min_size = 5,
-  resolution = "auto", gap_threshold = 1, grange = FALSE)
+SpectralTAD(
+  cont_mat,
+  chr,
+  levels = 1,
+  qual_filter = FALSE,
+  z_clust = FALSE,
+  eigenvalues = 2,
+  min_size = 5,
+  window_size = 25,
+  resolution = "auto",
+  gap_threshold = 1,
+  grange = FALSE,
+  out_format = "none",
+  out_path = chr
+)
 }
 \arguments{
 \item{cont_mat}{Contact matrix in either sparse 3 column, n x n or n x (n+3)
 form where the first three columns are coordinates in BED format.
 If an x n matrix is used, the column names must correspond to the start
-point of the corresponding bin. Required.}
+point of the corresponding bin. If large mode is selected, then
+this matrix must be a tab-seperated n x n or n x (n+3) and it should be the 
+path to a contact matrix. Required.}
 
 \item{chr}{The chromosome of the contact matrix being analyzed. Required.}
 
@@ -30,6 +44,10 @@ The default and suggested setting is 2.}
 
 \item{min_size}{The minimum allowable TAD size measured in bins. Default is 5.}
 
+\item{window_size}{The size of the sliding window for calculating TADs.
+Smaller window sizes correspond to less noise from long-range contacts
+but limit the possible size of TADs}
+
 \item{resolution}{The resolution of the contact matrix. If none selected,
 the resolution is estimated by taking the most common distance between bins.
 For n x (n+3) contact matrices, this value is automatically calculated
@@ -40,6 +58,13 @@ a column/row is removed from the analysis. 1=100\%, .7 = 70\%, etc. Default is 1
 
 \item{grange}{Parameter to determine whether the result should be a 
 GRangeList object. Defaults to FALSE}
+
+\item{out_format}{Specifies the format of the file which SpectralTAD outputs. If
+"none, no file is output. "juicebox" or "bedpe" returns a bedpe file 
+compatible with juicebox. "hicexplorer" or "bed" returns a bed file compatible with 
+ hicexplorer. Default is none}
+
+\item{out_path}{Path of output file. Default is the chromosome}
 }
 \value{
 A list where each entry is in BED format corresponding to the level of the hierarchy.
