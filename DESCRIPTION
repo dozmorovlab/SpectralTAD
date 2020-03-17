@@ -1,6 +1,6 @@
 Package: SpectralTAD
 Title: SpectralTAD: Hierarchical TAD detection using spectral clustering
-Version: 1.1.3
+Version: 1.2.0
 Author:
     Kellen Cresswell <cresswellkg@vcu.edu>,
     John Stansfield <stansfieldjc@vcu.edu>, 
