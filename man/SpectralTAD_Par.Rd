@@ -4,20 +4,10 @@
 \alias{SpectralTAD_Par}
 \title{Parallelized Hierarchical Spectral Clustering of TADs}
 \usage{
-SpectralTAD_Par(
-  cont_list,
-  chr,
-  levels = 1,
-  qual_filter = FALSE,
-  z_clust = FALSE,
-  eigenvalues = 2,
-  min_size = 5,
-  resolution = "auto",
-  grange = FALSE,
-  gap_threshold = 1,
-  cores = "auto",
-  labels = NULL
-)
+SpectralTAD_Par(cont_list, chr, levels = 1, qual_filter = FALSE,
+  z_clust = FALSE, eigenvalues = 2, min_size = 5, window_size = 25,
+  resolution = "auto", grange = FALSE, gap_threshold = 1,
+  cores = "auto", labels = NULL)
 }
 \arguments{
 \item{cont_list}{List of contact matrices where each is in either
@@ -42,6 +32,10 @@ their eigenvector gaps. Default is TRUE.}
 The default and suggested setting is 2.}
 
 \item{min_size}{The minimum allowable TAD size measured in bins. Default is 5.}
+
+\item{window_size}{The size of the sliding window for calculating TADs.
+Smaller window sizes correspond to less noise from long-range contacts
+but limit the possible size of TADs}
 
 \item{resolution}{The resolution of the contact matrix. If none selected,
 the resolution is estimated by taking the most common distance between bins.

@@ -17,6 +17,9 @@
 #' @param eigenvalues The number of eigenvectors to be calculated.
 #' The default and suggested setting is 2.
 #' @param min_size The minimum allowable TAD size measured in bins. Default is 5.
+#' @param window_size The size of the sliding window for calculating TADs.
+#' Smaller window sizes correspond to less noise from long-range contacts
+#' but limit the possible size of TADs
 #' @param resolution The resolution of the contact matrix. If none selected,
 #' the resolution is estimated by taking the most common distance between bins.
 #' For n x (n+3) contact matrices, this value is automatically calculated
@@ -60,6 +63,7 @@ SpectralTAD_Par = function(cont_list, chr, levels = 1,
                            z_clust = FALSE, 
                            eigenvalues = 2,
                            min_size =5,
+                           window_size = 25,
                            resolution = "auto", grange = FALSE, 
                            gap_threshold = 1, cores = "auto", 
                            labels = NULL) {
@@ -95,9 +99,11 @@ SpectralTAD_Par = function(cont_list, chr, levels = 1,
                                                              eigenvalues, z_clust, qual_filter, levels, min_size,
                                                              chr, gap_threshold, grange) spec_fun(cont_mat = cont_list[[x]],
                                                              chr[[x]], levels = levels, qual_filter = qual_filter,
-                                                             z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size),
+                                                             z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size,
+                                                             window_size = window_size),
                                                              spec_fun = SpectralTAD, cont_list = cont_list, eigenvalues = eigenvalues,
-                                                             min_size = min_size, levels = levels,z_clust = z_clust, qual_filter = qual_filter,
+                                                             min_size = min_size, levels = levels,z_clust = z_clust, 
+                                                             window_size = window_size, qual_filter = qual_filter,
                                                              chr = chr, gap_threshold = gap_threshold, grange = grange)
 
   #Assign labels to identify each contact matrix
