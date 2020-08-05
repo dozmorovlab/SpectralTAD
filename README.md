@@ -6,6 +6,8 @@
 [![Codecov test coverage](https://codecov.io/gh/cresswellkg/SpectralTAD/branch/master/graph/badge.svg)](https://codecov.io/gh/cresswellkg/SpectralTAD?branch=master)
 <!-- badges: end -->
 
+Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “[SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering](https://doi.org/10.1186/s12859-020-03652-w).” BMC Bioinformatics 21, no. 1 (December 2020): 319.
+
 
 `SpectralTAD` is a TAD caller that uses a modified form of spectral clustering 
 to quickly identify hierarchical topologically associating domains (TADs). 
