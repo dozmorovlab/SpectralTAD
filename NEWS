@@ -1,0 +1,11 @@
+Changes in version 1.2.2 (2020-09-29)
++ Make 'dplyr::lag' explicit in 'SpectralTAD'
++ Make 'window_size' explicit in 'SpectralTAD_Par', 'bplapply'
++ Track NEWS
++ Add CITATION
++ Make the vignette to conform with new knitr requirements
++ Add @usage data(rao_chr20_25_rep)
++ Add @importFrom utils write.table
++ Add URLs to DESCRIPTION
+Version 1.2.1 (2019-09-12)
++ Release version for Bioconductor
