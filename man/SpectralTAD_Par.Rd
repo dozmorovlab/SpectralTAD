@@ -4,10 +4,21 @@
 \alias{SpectralTAD_Par}
 \title{Parallelized Hierarchical Spectral Clustering of TADs}
 \usage{
-SpectralTAD_Par(cont_list, chr, levels = 1, qual_filter = FALSE,
-  z_clust = FALSE, eigenvalues = 2, min_size = 5, window_size = 25,
-  resolution = "auto", grange = FALSE, gap_threshold = 1,
-  cores = "auto", labels = NULL)
+SpectralTAD_Par(
+  cont_list,
+  chr,
+  levels = 1,
+  qual_filter = FALSE,
+  z_clust = FALSE,
+  eigenvalues = 2,
+  min_size = 5,
+  window_size = 25,
+  resolution = "auto",
+  grange = FALSE,
+  gap_threshold = 1,
+  cores = "auto",
+  labels = NULL
+)
 }
 \arguments{
 \item{cont_list}{List of contact matrices where each is in either
