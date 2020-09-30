@@ -16,7 +16,7 @@ Description:
     the number of hierarchical levels to be returned.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Imports: 
     dplyr,
     PRIMME,
@@ -39,3 +39,5 @@ Suggests:
 Depends: R (>= 3.6)
 VignetteBuilder: knitr
 biocViews: Software, HiC, Sequencing, FeatureExtraction, Clustering
+BugReports: https://github.com/dozmorovlab/SpectralTAD/issues
+URL: https://github.com/dozmorovlab/SpectralTAD
