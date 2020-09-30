@@ -99,16 +99,18 @@ chr20 1200000 1750000     2
 
 ## Citation
 
-Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. 2019. “SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering,” February. Cold Spring Harbor Laboratory. https://doi.org/10.1101/549170.
+Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. "SpectralTAD: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering." BMC bioinformatics 21, no. 1 (2020): 1-19. https://doi.org/10.1186/s12859-020-03652-w
 
 ```
-@Article{Cresswell:2019aa,
-  author    = {Kellen G. Cresswell and John C. Stansfield and Mikhail G. Dozmorov},
-  title     = {{SpectralTAD}: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering},
-  year      = {2019},
-  month     = {feb},
-  doi       = {10.1101/549170},
-  publisher = {Cold Spring Harbor Laboratory},
+@article{cresswell2020spectraltad,
+  title={SpectralTAD: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering},
+  author={Cresswell, Kellen G and Stansfield, John C and Dozmorov, Mikhail G},
+  journal={BMC bioinformatics},
+  volume={21},
+  number={1},
+  pages={1--19},
+  year={2020},
+  publisher={Springer}
 }
 ```
 
