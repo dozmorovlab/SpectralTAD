@@ -97,7 +97,7 @@ SpectralTAD_Par = function(cont_list, chr, levels = 1,
 
   bed = BiocParallel::bplapply(seq_len(length(cont_list)), function(x, spec_fun, cont_list,
                                                              eigenvalues, z_clust, qual_filter, levels, min_size,
-                                                             chr, gap_threshold, grange) spec_fun(cont_mat = cont_list[[x]],
+                                                             chr, gap_threshold, grange, window_size) spec_fun(cont_mat = cont_list[[x]],
                                                              chr[[x]], levels = levels, qual_filter = qual_filter,
                                                              z_clust = z_clust, eigenvalues = eigenvalues, min_size = min_size,
                                                              window_size = window_size),
