@@ -1,0 +1,18 @@
+citHeader("To cite package 'SpectralTAD', please, use:")
+
+citEntry(entry = "Article",
+	title = "SpectralTAD: an R package for defining a hierarchy of topologically associated domains using spectral clustering",
+	author = personList(as.person("Kellen G. Cresswell"),
+		as.person("John C. Stansfield"),
+		as.person("Mikhail G. Dozmorov")),
+	journal = "BMC Bioinformatics",
+	year = 2020L,
+	volume = 21L,
+	number = 1L,
+	month = "Dec",
+	url = "https://github.com/dozmorovlab/SpectralTAD",
+	doi = "10.1186/s12859-020-03652-w",
+	textVersion = "Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering.” BMC Bioinformatics 21, no. 1 (December 2020): 319. https://doi.org/10.1186/s12859-020-03652-w"
+)
+
+
