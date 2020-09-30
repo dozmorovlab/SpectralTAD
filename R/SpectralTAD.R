@@ -3,6 +3,7 @@
 #' @import dplyr
 #' @import magrittr
 #' @importFrom GenomicRanges GRanges GRangesList start
+#' @importFrom utils write.table
 #' @param cont_mat Contact matrix in either sparse 3 column, n x n or n x (n+3)
 #' form where the first three columns are coordinates in BED format.
 #' If an x n matrix is used, the column names must correspond to the start
@@ -98,7 +99,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     if (resolution == "auto") {
       message("Estimating resolution")
-      resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-lag(as.numeric(colnames(cont_mat)))))[1])
+      resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-dplyr::lag(as.numeric(colnames(cont_mat)))))[1])
     }
 
   } else if (col_test-row_test == 3) {
@@ -136,7 +137,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
       #Estimating resolution based on most common distance between loci
 
-      resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-lag(as.numeric(colnames(cont_mat)))))[1])
+      resolution = as.numeric(names(table(as.numeric(colnames(cont_mat))-dplyr::lag(as.numeric(colnames(cont_mat)))))[1])
   }
   
   if (resolution>200000) {
