@@ -16,5 +16,6 @@
 #' of chromatin looping. Cell 2014 Dec 18;159(7):1665-80. PMID: 25497547. 
 #' Available at \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525}
 #' @return A data.frame
+#' @usage data(rao_chr20_25_rep)
 #'
 "rao_chr20_25_rep"
