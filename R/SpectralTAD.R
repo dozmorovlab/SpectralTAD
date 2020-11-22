@@ -61,7 +61,10 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
                        window_size = 25,
                        resolution = "auto", gap_threshold = 1,
                        grange = FALSE, out_format = "none", out_path = chr) {
-
+  
+  #Disable scientific notation
+  options(scipen = 999)
+  
   #Calculate the number of rows and columns of the contact matrix
 
   
@@ -235,9 +238,13 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       #Get just coordinates
       bed_out = bind_rows(called_tads) %>% 
         dplyr::select(chr,start,end)
+      #Same object, different colnames
+      bed_out1 <- bed_out
+      colnames(bed_out1) <- c("chr1", "start1", "end1")
       #Combine into first six columns of bedpe and add extra columns
-      bed_out = bind_cols(bed_out, bed_out) %>% 
+      bed_out = bind_cols(bed_out, bed_out1) %>% 
         mutate(name = ".", score = ".", strand1 =".", strand2 = ".")
+      colnames(bed_out)
       #Binding tads for color assignment
       bound_tads = bind_rows(called_tads)
       #Create vector of colors
@@ -246,15 +253,15 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       bed_out = bed_out %>% 
         mutate(color =colors[bound_tads$Level])
       
-      bed_out = bed_out %>% mutate(start = format(start, scientific = FALSE), end = format(end, scientific = FALSE), 
-                                   start1 = format(start1, scientific = FALSE), end1 = format(end1, scientific = FALSE))
+      # bed_out = bed_out %>% mutate(start = format(start, scientific = FALSE), end = format(end, scientific = FALSE), 
+      #                              start1 = format(start1, scientific = FALSE), end1 = format(end1, scientific = FALSE))
       write.table(bed_out, out_path, quote = FALSE,
                   row.names = FALSE, sep = "\t", col.names = FALSE)
     } else if (out_format %in% c("bed", "hicexplorer")) {
       bed_out = bind_rows(called_tads) %>% 
-        dplyr::select(chr,start,end) %>% 
-        mutate(start = format(start, scientific = FALSE), 
-               end = format(end, scientific = FALSE))
+        dplyr::select(chr,start,end)  
+        # mutate(start = format(start, scientific = FALSE), 
+        #        end = format(end, scientific = FALSE))
       write.table(bed_out, out_path, quote = FALSE,
                   row.names = FALSE, sep = "\t", col.names = FALSE)
     } else {
