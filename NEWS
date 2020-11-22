@@ -1,4 +1,4 @@
-Changes in version 1.5.2 (2020-11-22)
+Changes in version 1.7.1 (2020-11-22)
 + Fix bedpe output for Juicebox
 Changes in version 1.5.1 (2020-09-29)
 + Make 'dplyr::lag' explicit in 'SpectralTAD'
