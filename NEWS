@@ -1,3 +1,5 @@
+Changes in version 1.11.0 (2022-04-21)
++ Match NEWS and DESCRIPTION versioning
 Changes in version 1.7.1 (2020-11-22)
 + Fix bedpe output for Juicebox
 Changes in version 1.5.1 (2020-09-29)
