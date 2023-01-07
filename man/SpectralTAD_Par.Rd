@@ -95,5 +95,5 @@ mat_list = list(rao_chr20_25_rep, rao_chr20_25_rep)
 chr = c("chr20", "chr20")
 #Make a vector of labels
 labels = c("run1", "run2")
-spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels)
+spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels, cores = 2)
 }
