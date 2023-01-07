@@ -1,11 +1,19 @@
 Package: SpectralTAD
 Title: SpectralTAD: Hierarchical TAD detection using spectral clustering
-Version: 1.11.0
-Author:
-    Kellen Cresswell <cresswellkg@vcu.edu>,
-    John Stansfield <stansfieldjc@vcu.edu>, 
-    Mikhail Dozmorov <mikhail.dozmorov@vcuhealth.org>
-Maintainer: Kellen Cresswell <cresswellkg@vcu.edu>
+Version: 1.11.1
+Authors@R: c(
+    person(given = "Mikhail",
+           family = "Dozmorov",
+           role = c("aut", "cre"),
+           email = "mikhail.dozmorov@gmail.com",
+           comment = c(ORCID = "0000-0002-0086-8358")),
+    person(given = "Kellen",
+           family = "Cresswell",
+           role = c("aut")),
+    person(given = "John",
+           family = "Stansfield",
+           role = c("aut"))
+           )
 Description: 
     SpectralTAD is an R package designed to identify Topologically Associated 
     Domains (TADs) from Hi-C contact matrices. It uses a modified version of 
@@ -16,7 +24,7 @@ Description:
     the number of hierarchical levels to be returned.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Imports: 
     dplyr,
     PRIMME,
@@ -26,7 +34,8 @@ Imports:
     BiocParallel,
     magrittr,
     HiCcompare,
-    GenomicRanges
+    GenomicRanges,
+    utils
 Suggests: 
     BiocCheck,
     BiocManager,
