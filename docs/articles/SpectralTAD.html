@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpectralTAD</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/SpectralTAD.html">Get started</a>
 </li>
@@ -52,8 +48,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/dozmorovlab/SpectralTAD/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/dozmorovlab/SpectralTAD/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -67,19 +63,27 @@
 
       
 
-      </header><script src="SpectralTAD_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SpectralTAD Vignette</h1>
-                        <h4 class="author">Kellen Cresswell</h4>
+                        <h4 data-toc-skip class="author">Kellen
+Cresswell</h4>
             <address class="author_afil">
-      Department of Biostatistics, Virginia Commonwealth University, Richmond, VA<br><h4 class="author">John Stansfield</h4>
+      Department of Biostatistics, Virginia Commonwealth University,
+Richmond,
+VA<br><h4 data-toc-skip class="author">John
+Stansfield</h4>
             <address class="author_afil">
-      Department of Biostatistics, Virginia Commonwealth University, Richmond, VA<br><h4 class="author">Mikhail Dozmorov</h4>
+      Department of Biostatistics, Virginia Commonwealth University,
+Richmond,
+VA<br><h4 data-toc-skip class="author">Mikhail
+Dozmorov</h4>
             <address class="author_afil">
-      Department of Biostatistics, Virginia Commonwealth University, Richmond, VA<br><h4 class="date">September 30, 2020</h4>
+      Department of Biostatistics, Virginia Commonwealth University,
+Richmond, VA<br><h4 data-toc-skip class="date">January 9, 2023</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/dozmorovlab/SpectralTAD/blob/master/vignettes/SpectralTAD.Rmd"><code>vignettes/SpectralTAD.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dozmorovlab/SpectralTAD/blob/HEAD/vignettes/SpectralTAD.Rmd" class="external-link"><code>vignettes/SpectralTAD.Rmd</code></a></small>
       <div class="hidden name"><code>SpectralTAD.Rmd</code></div>
 
     </address>
@@ -90,1052 +94,881 @@
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>SpectralTAD is an R package designed to identify Topologically Associated Domains (TADs) from Hi-C contact matrices. It uses a modified version of spectral clustering that uses a sliding window to quickly detect TADs. The function works on a range of different formats of contact matrices and returns a list of data frames or GRanges in BED format with TAD coordinates, seperated by hierarchy level. The method does not require users to adjust any parameters to work and gives them control over the number of levels to be returned.</p>
+      <p>SpectralTAD is an R package designed to identify Topologically
+      Associated Domains (TADs) from Hi-C contact matrices. It uses a
+      modified version of spectral clustering that uses a sliding window
+      to quickly detect TADs. The function works on a range of different
+      formats of contact matrices and returns a list of data frames or
+      GRanges in BED format with TAD coordinates, seperated by hierarchy
+      level. The method does not require users to adjust any parameters
+      to work and gives them control over the number of levels to be
+      returned.</p>
     </div>
     
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
-<p><code>SpectralTAD</code> is a package designed to allow for fast hierarchical TAD calling on a wide-variety of chromatin conformation capture (Hi-C) data. <code>SpectralTAD</code> takes a contact matrix as an input and outputs a list of data frames or GRange objects in BED format containing coordinates corresponding to TAD locations. The package contains two functions, <code><a href="../reference/SpectralTAD.html">SpectralTAD()</a></code> and <code><a href="../reference/SpectralTAD_Par.html">SpectralTAD_Par()</a></code> with SpectralTAD being a single-CPU TAD-caller and <code>SpectralTAD_Par</code> being the parallelized version. This package provides flexibility in the data it accepts, allowing for <span class="math inline">\(n \times n\)</span> (square numerical matrix), <span class="math inline">\(n \times (n+3)\)</span> (square numerical matrix with the additional chromosome, start, end columns), and 3-column sparse matrices (described below). There are no parameters required for running the functions, though certain methods for customizing the results are available. The idea is to give users the freedom to control how they call TADs while giving them the option to perform it in an unsupervised manner.</p>
-<p>The package is based around the windowed spectral clustering algorithm, introduced by <span class="citation">(Cresswell, Stansfield, and Dozmorov 2019)</span> , which is designed to be robust to sparsity, noise, and sequencing depth of Hi-C data.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p><code>SpectralTAD</code> is a package designed to allow for fast
+hierarchical TAD calling on a wide-variety of chromatin conformation
+capture (Hi-C) data. <code>SpectralTAD</code> takes a contact matrix as
+an input and outputs a list of data frames or GRange objects in BED
+format containing coordinates corresponding to TAD locations. The
+package contains two functions, <code><a href="../reference/SpectralTAD.html">SpectralTAD()</a></code> and
+<code><a href="../reference/SpectralTAD_Par.html">SpectralTAD_Par()</a></code> with SpectralTAD being a single-CPU
+TAD-caller and <code>SpectralTAD_Par</code> being the parallelized
+version. This package provides flexibility in the data it accepts,
+allowing for <span class="math inline">\(n \times n\)</span> (square
+numerical matrix), <span class="math inline">\(n \times (n+3)\)</span>
+(square numerical matrix with the additional chromosome, start, end
+columns), and 3-column sparse matrices (described below). There are no
+parameters required for running the functions, though certain methods
+for customizing the results are available. The idea is to give users the
+freedom to control how they call TADs while giving them the option to
+perform it in an unsupervised manner.</p>
+<p>The package is based around the windowed spectral clustering
+algorithm, introduced by <span class="citation">(Cresswell, Stansfield,
+and Dozmorov 2019)</span> , which is designed to be robust to sparsity,
+noise, and sequencing depth of Hi-C data.</p>
 </div>
-<div id="getting-started" class="section level1">
-<h1 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h1>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="co"># if (!requireNamespace("BiocManager", quietly=TRUE))</span>
-<span class="co">#     install.packages("BiocManager")</span>
-<span class="co"># BiocManager::install("SpectralTAD")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"cresswellkg/SpectralTAD"</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dozmorovlab/SpectralTAD">SpectralTAD</a></span><span class="op">)</span></pre></div>
+<div class="section level2">
+<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<div class="section level3">
+<h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h3>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># if (!requireNamespace("BiocManager", quietly=TRUE))</span></span>
+<span><span class="co">#     install.packages("BiocManager")</span></span>
+<span><span class="co"># BiocManager::install("SpectralTAD")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"cresswellkg/SpectralTAD"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dozmorovlab/SpectralTAD" class="external-link">SpectralTAD</a></span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="input-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#input-data" class="anchor"></a>Input data</h2>
-<div id="working-with-n-times-n-matrices" class="section level3">
-<h3 class="hasAnchor">
-<a href="#working-with-n-times-n-matrices" class="anchor"></a>Working with <span class="math inline">\(n \times n\)</span> matrices</h3>
-<p><span class="math inline">\(n \times n\)</span> contact matrices, are most commonly associated with data coming from the Bing Ren lab (<a href="http://chromosome.sdsc.edu/mouse/hi-c/download.html" class="uri">http://chromosome.sdsc.edu/mouse/hi-c/download.html</a>). These contact matrices are square and symmetric with entry <span class="math inline">\(ij\)</span> corresponding to the number of contacts between region <span class="math inline">\(i\)</span> and region <span class="math inline">\(j\)</span>. Below is an example of a <span class="math inline">\(5 \times 5\)</span> region of an <span class="math inline">\(n \times n\)</span> contact matrix. Derived from <span class="citation">(Rao et al. 2014)</span>, chromosome 20 data at 25kb resolution. Note the symmetry around the diagonal - the typical shape of chromatin interaction matrix.</p>
-<pre><code>##             50000    75000   100000   125000   150000
-##    50000     2021      727      203      205      155
-##    75000      727     3701      583      491      348
-##   100000      203      583     2023      603      274
-##   125000      205      491      603     3350      676
-##   150000      155      348      274      676     2528</code></pre>
+<div class="section level3">
+<h3 id="input-data">Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+</h3>
+<div class="section level4">
+<h4 id="working-with-n-times-n-matrices">Working with <span class="math inline">\(n \times n\)</span>
+matrices<a class="anchor" aria-label="anchor" href="#working-with-n-times-n-matrices"></a>
+</h4>
+<p><span class="math inline">\(n \times n\)</span> contact matrices, are
+most commonly associated with data coming from the Bing Ren lab (<a href="http://chromosome.sdsc.edu/mouse/hi-c/download.html" class="external-link uri">http://chromosome.sdsc.edu/mouse/hi-c/download.html</a>).
+These contact matrices are square and symmetric with entry <span class="math inline">\(ij\)</span> corresponding to the number of
+contacts between region <span class="math inline">\(i\)</span> and
+region <span class="math inline">\(j\)</span>. Below is an example of a
+<span class="math inline">\(5 \times 5\)</span> region of an <span class="math inline">\(n \times n\)</span> contact matrix. Derived from
+<span class="citation">(Rao et al. 2014)</span>, chromosome 20 data at
+25kb resolution. Note the symmetry around the diagonal - the typical
+shape of chromatin interaction matrix.</p>
+<pre><code><span><span class="co">##             50000    75000   100000   125000   150000</span></span>
+<span><span class="co">##    50000     2021      727      203      205      155</span></span>
+<span><span class="co">##    75000      727     3701      583      491      348</span></span>
+<span><span class="co">##   100000      203      583     2023      603      274</span></span>
+<span><span class="co">##   125000      205      491      603     3350      676</span></span>
+<span><span class="co">##   150000      155      348      274      676     2528</span></span></code></pre>
 </div>
-<div id="working-with-n-times-n3-matrices" class="section level3">
-<h3 class="hasAnchor">
-<a href="#working-with-n-times-n3-matrices" class="anchor"></a>Working with <span class="math inline">\(n \times (n+3)\)</span> matrices</h3>
-<p><span class="math inline">\(n \times (n+3)\)</span> matrices are commonly associated with the TopDom tad-caller (<a href="http://zhoulab.usc.edu/TopDom/" class="uri">http://zhoulab.usc.edu/TopDom/</a>). These matrices consist of a normal <span class="math inline">\(n \times n\)</span> matrix but with 3 additional leading columns containg the chromosome, the start of the region and the end of the region. Regions in this case are determined by the resolution of the data. The typical <span class="math inline">\(n \times (n+3)\)</span> matrix is shown below.</p>
-<pre><code>##                                                          
-## 1  chr19  50000  75000 2021  727  203  205  155  165  193
-## 2  chr19  75000 100000  727 3701  583  491  348  335  350
-## 3  chr19 100000 125000  203  583 2023  603  274  228  213
-## 4  chr19 125000 150000  205  491  603 3350  676  447  390
-## 5  chr19 150000 175000  155  348  274  676 2528  732  463
-## 6  chr19 175000 200000  165  335  228  447  732 3497  998
-## 7  chr19 200000 225000  193  350  213  390  463  998 4450
-## 8  chr19 225000 250000  135  236  137  259  301  543 1061
-## 9  chr19 250000 275000  158  259  183  299  317  554  731
-## 10 chr19 275000 300000   96  166  115  171  179  319  416</code></pre>
+<div class="section level4">
+<h4 id="working-with-n-times-n3-matrices">Working with <span class="math inline">\(n \times (n+3)\)</span>
+matrices<a class="anchor" aria-label="anchor" href="#working-with-n-times-n3-matrices"></a>
+</h4>
+<p><span class="math inline">\(n \times (n+3)\)</span> matrices are
+commonly associated with the TopDom tad-caller (<a href="http://zhoulab.usc.edu/TopDom/" class="external-link uri">http://zhoulab.usc.edu/TopDom/</a>). These matrices consist
+of a normal <span class="math inline">\(n \times n\)</span> matrix but
+with 3 additional leading columns containg the chromosome, the start of
+the region and the end of the region. Regions in this case are
+determined by the resolution of the data. The typical <span class="math inline">\(n \times (n+3)\)</span> matrix is shown below.</p>
+<pre><code><span><span class="co">##                                                          </span></span>
+<span><span class="co">## 1  chr19  50000  75000 2021  727  203  205  155  165  193</span></span>
+<span><span class="co">## 2  chr19  75000 100000  727 3701  583  491  348  335  350</span></span>
+<span><span class="co">## 3  chr19 100000 125000  203  583 2023  603  274  228  213</span></span>
+<span><span class="co">## 4  chr19 125000 150000  205  491  603 3350  676  447  390</span></span>
+<span><span class="co">## 5  chr19 150000 175000  155  348  274  676 2528  732  463</span></span>
+<span><span class="co">## 6  chr19 175000 200000  165  335  228  447  732 3497  998</span></span>
+<span><span class="co">## 7  chr19 200000 225000  193  350  213  390  463  998 4450</span></span>
+<span><span class="co">## 8  chr19 225000 250000  135  236  137  259  301  543 1061</span></span>
+<span><span class="co">## 9  chr19 250000 275000  158  259  183  299  317  554  731</span></span>
+<span><span class="co">## 10 chr19 275000 300000   96  166  115  171  179  319  416</span></span></code></pre>
 </div>
-<div id="working-with-sparse-3-column-matrices" class="section level3">
-<h3 class="hasAnchor">
-<a href="#working-with-sparse-3-column-matrices" class="anchor"></a>Working with sparse 3-column matrices</h3>
-<p>Sparse 3-column matrices, sometimes referred to as a coordinated lists, are matrices where the first and second column refer to region <span class="math inline">\(i\)</span> and region <span class="math inline">\(j\)</span> of the chromosome, and the third column is the number of contacts between them. This style is becoming increasingly popular and is associated with raw data from Rao (<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525</a>), and is the data output produced by the Juicer tool <span class="citation">(Durand et al. 2016)</span>. 3-column matrices are handled internally in the package by converting them to <span class="math inline">\(n \times n\)</span> matrices using the <code>HiCcompare</code> package’s <code>sparse2full()</code> function. The first 5 rows of a typical sparse 3-column matrix is shown below.</p>
-<pre><code>##    region1 region2   IF
-## 1:   50000   50000 2021
-## 2:   50000   75000  727
-## 3:   75000   75000 3701
-## 4:   50000  100000  203
-## 5:   75000  100000  583</code></pre>
+<div class="section level4">
+<h4 id="working-with-sparse-3-column-matrices">Working with sparse 3-column matrices<a class="anchor" aria-label="anchor" href="#working-with-sparse-3-column-matrices"></a>
+</h4>
+<p>Sparse 3-column matrices, sometimes referred to as a coordinated
+lists, are matrices where the first and second column refer to region
+<span class="math inline">\(i\)</span> and region <span class="math inline">\(j\)</span> of the chromosome, and the third column
+is the number of contacts between them. This style is becoming
+increasingly popular and is associated with raw data from Rao (<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525" class="external-link uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525</a>),
+and is the data output produced by the Juicer tool <span class="citation">(Durand et al. 2016)</span>. 3-column matrices are
+handled internally in the package by converting them to <span class="math inline">\(n \times n\)</span> matrices using the
+<code>HiCcompare</code> package’s <code>sparse2full()</code> function.
+The first 5 rows of a typical sparse 3-column matrix is shown below.</p>
+<pre><code><span><span class="co">##    region1 region2   IF</span></span>
+<span><span class="co">## 1:   50000   50000 2021</span></span>
+<span><span class="co">## 2:   50000   75000  727</span></span>
+<span><span class="co">## 3:   75000   75000 3701</span></span>
+<span><span class="co">## 4:   50000  100000  203</span></span>
+<span><span class="co">## 5:   75000  100000  583</span></span></code></pre>
 </div>
-<div id="working-with-other-data-types" class="section level3">
-<h3 class="hasAnchor">
-<a href="#working-with-other-data-types" class="anchor"></a>Working with other data types</h3>
-<p>Users can also find TADs from data output by <code>juicer</code> (<a href="https://github.com/aidenlab/juicer" class="uri">https://github.com/aidenlab/juicer</a>, .hic format), <code>cooler</code> (<a href="http://cooler.readthedocs.io/en/latest/index.html" class="uri">http://cooler.readthedocs.io/en/latest/index.html</a>, .cool format), and HiC-Pro (<a href="https://github.com/nservant/HiC-Pro" class="uri">https://github.com/nservant/HiC-Pro</a>, .matrix and .bed formats) with minor pre-processing using the <code>HiCcompare</code> package.</p>
-<div id="working-with--hic-files" class="section level4">
-<h4 class="hasAnchor">
-<a href="#working-with--hic-files" class="anchor"></a>Working with .hic files</h4>
-<p>Sparse matrices can be extracted from .hic files using the <code>straw</code> tool <a href="https://github.com/theaidenlab/straw">https://github.com/theaidenlab/straw</a>. See examples on how to use <code>straw</code> at <a href="https://github.com/theaidenlab/straw/wiki/CPP#running">https://github.com/theaidenlab/straw/wiki/CPP#running</a>. Briefly, <code>straw</code> requires several inputs for the extraction of data from a <code>.hic</code> file:</p>
+<div class="section level4">
+<h4 id="working-with-other-data-types">Working with other data types<a class="anchor" aria-label="anchor" href="#working-with-other-data-types"></a>
+</h4>
+<p>Users can also find TADs from data output by <code>juicer</code> (<a href="https://github.com/aidenlab/juicer" class="external-link uri">https://github.com/aidenlab/juicer</a>, .hic format),
+<code>cooler</code> (<a href="http://cooler.readthedocs.io/en/latest/index.html" class="external-link uri">http://cooler.readthedocs.io/en/latest/index.html</a>, .cool
+format), and HiC-Pro (<a href="https://github.com/nservant/HiC-Pro" class="external-link uri">https://github.com/nservant/HiC-Pro</a>, .matrix and .bed
+formats) with minor pre-processing using the <code>HiCcompare</code>
+package.</p>
+<div class="section level5">
+<h5 id="working-with--hic-files">Working with .hic files<a class="anchor" aria-label="anchor" href="#working-with--hic-files"></a>
+</h5>
+<p>Sparse matrices can be extracted from .hic files using the
+<code>straw</code> tool <a href="https://github.com/theaidenlab/straw" class="external-link">https://github.com/theaidenlab/straw</a>.
+See examples on how to use <code>straw</code> at <a href="https://github.com/theaidenlab/straw/wiki/CPP#running" class="external-link">https://github.com/theaidenlab/straw/wiki/CPP#running</a>.
+Briefly, <code>straw</code> requires several inputs for the extraction
+of data from a <code>.hic</code> file:</p>
 <p><code>&lt;NONE/VC/VC_SQRT/KR&gt; &lt;hicFile(s)&gt; &lt;chr1&gt;[:x1:x2] &lt;chr2&gt;[:y1:y2] &lt;BP/FRAG&gt; &lt;binsize&gt;</code></p>
-<p>The first field indicates the type of normalization to be applied. The Vanilla Coverage (VC), the square root of Vanilla Coverage (VC_SQRT), and Knight-Ruiz (KR) normalization techniques are available to be applied to the contact maps. Alternatively, the raw contact maps can be extracted using the NONE option (recommended for SpectralTAD).</p>
-<p>The second field is the file name of the <code>.hic</code> file to be extracted. The following two fields are the chromosome numbers for the contact map desired, i.e., for the intrachromosomal map of chr1 the user would enter 1 1 in these fields. The next field determines if basepairs or restriction fragment resolution files will be returned. Typically, the user will want to use the <code>BP</code> option. The final field specifies the resolution of the contact map.</p>
-<p>For example, to extract the raw matrix corresponding to chromosome 22 at 500kb resolution from the <code>GSE63525_K562_combined_30.hic</code> file, we would use the following command:</p>
+<p>The first field indicates the type of normalization to be applied.
+The Vanilla Coverage (VC), the square root of Vanilla Coverage
+(VC_SQRT), and Knight-Ruiz (KR) normalization techniques are available
+to be applied to the contact maps. Alternatively, the raw contact maps
+can be extracted using the NONE option (recommended for
+SpectralTAD).</p>
+<p>The second field is the file name of the <code>.hic</code> file to be
+extracted. The following two fields are the chromosome numbers for the
+contact map desired, i.e., for the intrachromosomal map of chr1 the user
+would enter 1 1 in these fields. The next field determines if basepairs
+or restriction fragment resolution files will be returned. Typically,
+the user will want to use the <code>BP</code> option. The final field
+specifies the resolution of the contact map.</p>
+<p>For example, to extract the raw matrix corresponding to chromosome 22
+at 500kb resolution from the <code>GSE63525_K562_combined_30.hic</code>
+file, we would use the following command:</p>
 <p><code>./straw NONE GSE63525_K562_combined_30.hic  22 22 BP 500000 &gt; K562.chr22.500kb.txt</code></p>
-<p>This will extract the data from the <code>.hic</code> file and save it to the <code>K562.chr22.500kb.txt</code> text file, in the sparse upper triangular matrix format. Typically, chromosome-specific matrices are saved in separate files. #### Working with .cool files</p>
-<p>The cooler software can be downloaded from <a href="http://cooler.readthedocs.io/en/latest/index.html" class="uri">http://cooler.readthedocs.io/en/latest/index.html</a>. It essentially provides access to a catalog of popular HiC datasets. We can pre-process and use .cool files that are associated with cooler files using the following steps:</p>
+<p>This will extract the data from the <code>.hic</code> file and save
+it to the <code>K562.chr22.500kb.txt</code> text file, in the sparse
+upper triangular matrix format. Typically, chromosome-specific matrices
+are saved in separate files. #### Working with .cool files</p>
+<p>The cooler software can be downloaded from <a href="http://cooler.readthedocs.io/en/latest/index.html" class="external-link uri">http://cooler.readthedocs.io/en/latest/index.html</a>. It
+essentially provides access to a catalog of popular HiC datasets. We can
+pre-process and use .cool files that are associated with cooler files
+using the following steps:</p>
 <ol style="list-style-type: decimal">
 <li>Download <code>.cool</code> file from (<a href="ftp://cooler.csail.mit.edu/coolers" class="uri">ftp://cooler.csail.mit.edu/coolers</a>)</li>
-<li>Convert to text file using <code>cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool &gt; Rao.GM12878.50kb.txt</code>
+<li>Convert to text file using
+<code>cooler dump --join Rao2014-GM12878-DpnII-allreps-filtered.50kb.cool &gt; Rao.GM12878.50kb.txt</code>
 </li>
 <li>Run the code below</li>
 </ol>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="co">#Read in data</span>
-<span class="va">cool_mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"Rao.GM12878.50kb.txt"</span><span class="op">)</span>
-<span class="co">#Convert to sparse 3-column matrix using cooler2sparse from HiCcompare</span>
-<span class="va">sparse_mats</span> <span class="op">=</span> <span class="fu">HiCcompare</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HiCcompare/man/cooler2sparse.html">cooler2sparse</a></span><span class="op">(</span><span class="va">cool_mat</span><span class="op">)</span>
-<span class="co">#Remove empty matrices if necessary</span>
-<span class="co">#sparse_mats = sparse_mats$cis[sapply(sparse_mats, nrow) != 0]</span>
-<span class="co">#Run SpectralTAD</span>
-<span class="va">spec_tads</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sparse_mats</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">sparse_mats</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span>, chr <span class="op">=</span> <span class="va">x</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Read in data</span></span>
+<span><span class="va">cool_mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="st">"Rao.GM12878.50kb.txt"</span><span class="op">)</span></span>
+<span><span class="co">#Convert to sparse 3-column matrix using cooler2sparse from HiCcompare</span></span>
+<span><span class="va">sparse_mats</span> <span class="op">=</span> <span class="fu">HiCcompare</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HiCcompare/man/cooler2sparse.html" class="external-link">cooler2sparse</a></span><span class="op">(</span><span class="va">cool_mat</span><span class="op">)</span></span>
+<span><span class="co">#Remove empty matrices if necessary</span></span>
+<span><span class="co">#sparse_mats = sparse_mats$cis[sapply(sparse_mats, nrow) != 0]</span></span>
+<span><span class="co">#Run SpectralTAD</span></span>
+<span><span class="va">spec_tads</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sparse_mats</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">sparse_mats</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span>, chr <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="working-with-hic-pro-files" class="section level4">
-<h4 class="hasAnchor">
-<a href="#working-with-hic-pro-files" class="anchor"></a>Working with HiC-Pro files</h4>
-<p>HiC-Pro data comes with 2 files, the <code>.matrix</code> file and the <code>.bed</code> file. The <code>.matrix</code> file is a 3-column matrix where instead of coordinates as the 1st and 2nd column, there is an ID. The <code>.bed</code> file maps these IDs to genomic coordinates. The steps for analyzing these files is shown below:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="co">#Read in both files</span>
-<span class="va">mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"amyg_100000.matrix"</span><span class="op">)</span>
-<span class="va">bed</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"amyg_100000_abs.bed"</span><span class="op">)</span>
-<span class="co">#Convert to modified bed format</span>
-<span class="va">sparse_mats</span> <span class="op">=</span> <span class="fu">HiCcompare</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HiCcompare/man/hicpro2bedpe.html">hicpro2bedpe</a></span><span class="op">(</span><span class="va">mat</span>,<span class="va">bed</span><span class="op">)</span>
-<span class="co">#Remove empty matrices if necessary</span>
-<span class="co">#sparse_mats$cis = sparse_mats$cis[sapply(sparse_mats, nrow) != 0]</span>
-<span class="co">#Go through all matrices</span>
-<span class="va">sparse_tads</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">sparse_mats</span><span class="op">$</span><span class="va">cis</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="co">#Pull out chromosome</span>
-  <span class="va">chr</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
-  <span class="co">#Subset to make three column matrix</span>
-  <span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">5</span>,<span class="fl">7</span><span class="op">)</span><span class="op">]</span>
-  <span class="co">#Run SpectralTAD</span>
-  <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">x</span>, chr<span class="op">=</span><span class="va">chr</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span></pre></div>
-</div>
-</div>
-</div>
-<div id="running-spectraltad" class="section level2">
-<h2 class="hasAnchor">
-<a href="#running-spectraltad" class="anchor"></a>Running SpectralTAD</h2>
-<p>Once matrices are in an acceptable format, SpectralTAD can be run with as little as two parameters or as many as eight. Below we show how to run the algorithm with just TAD detection and no quality filtering.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="co">#Get the rao contact matrix built into the package</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span></pre></div>
-<pre><code>##       V1     V2   V3
-## 1  50000  50000 2021
-## 2  50000  75000  727
-## 3  75000  75000 3701
-## 4  50000 100000  203
-## 5  75000 100000  583
-## 6 100000 100000 2023</code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="co">#We see that this is a sparse 3-column contact matrix</span>
-<span class="co">#Running the algorithm with resolution specified</span>
-<span class="va">results</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#Printing the top 5 TADs</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">Level_1</span>, <span class="fl">5</span><span class="op">)</span></pre></div>
-<pre><code>## # A tibble: 5 x 4
-##   chr     start     end Level
-##   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
-## 1 chr20   50000  325000     1
-## 2 chr20  325000  525000     1
-## 3 chr20  525000  725000     1
-## 4 chr20  725000 1200000     1
-## 5 chr20 1200000 1450000     1</code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="co">#Repeating without specifying resolution</span>
-<span class="va">no_res</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#We can see below that resolution can be estimated automatically if necessary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">results</span>, <span class="va">no_res</span><span class="op">)</span></pre></div>
-<pre><code>## [1] TRUE</code></pre>
-</div>
-<div id="filtering-tads" class="section level2">
-<h2 class="hasAnchor">
-<a href="#filtering-tads" class="anchor"></a>Filtering TADs</h2>
-<div id="silhouette-score-filtering" class="section level3">
-<h3 class="hasAnchor">
-<a href="#silhouette-score-filtering" class="anchor"></a>Silhouette score filtering</h3>
-<p>One method for filtering TADs is using group-wise silhouette scores. This is done by getting the overall silhouette for each group and removing those with a score of less than .25. A low silhouette score for a given TAD indicates a poor level of connectivity within it.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="co">#Running SpectralTAD with silhouette score filtering</span>
-<span class="va">qual_filt</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">TRUE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span>, resolution <span class="op">=</span> <span class="fl">25000</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="co">#Showing quality filtered results</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">qual_filt</span><span class="op">$</span><span class="va">Level_1</span>,<span class="fl">5</span><span class="op">)</span></pre></div>
-<pre><code>## # A tibble: 5 x 5
-##   chr     start     end Sil_Score Level
-##   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
-## 1 chr20   50000  325000     0.475     1
-## 2 chr20  325000  525000     0.699     1
-## 3 chr20  525000  725000     0.640     1
-## 4 chr20  725000 1200000     0.384     1
-## 5 chr20 1200000 1450000     0.676     1</code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit">
-<span class="co">#Quality filtering generally has different dimensions</span>
-<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">qual_filt</span><span class="op">$</span><span class="va">Level_1</span><span class="op">)</span></pre></div>
-<pre><code>## [1] 163   5</code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">Level_1</span><span class="op">)</span></pre></div>
-<pre><code>## [1] 165   4</code></pre>
-<p>The results when using the quality filtering option are altered to include a new column called <code>Sil_Score</code>. This column includes a group-wise silhouette score. In this example a single TAD was removed due to having poor organization (Low silhouette score).</p>
-</div>
-<div id="z-score-filtering" class="section level3">
-<h3 class="hasAnchor">
-<a href="#z-score-filtering" class="anchor"></a>Z-score filtering</h3>
-<p>Z-score filtering is based on observations about the log-normality of the distance between eigenvector gaps from <span class="citation">(Cresswell, Stansfield, and Dozmorov 2019)</span>. Z-score filtering bypasses the uses of silhouette score and defines a TAD boundary as the area between consecutive regions where the z-score of the eigenvector gap is greater than 2.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit">
-<span class="va">z_filt</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">TRUE</span>, resolution <span class="op">=</span> <span class="fl">25000</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">z_filt</span><span class="op">$</span><span class="va">Level_1</span>, <span class="fl">5</span><span class="op">)</span></pre></div>
-<pre><code>## # A tibble: 5 x 4
-##   chr     start     end Level
-##   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
-## 1 chr20   50000  350000     1
-## 2 chr20  350000  550000     1
-## 3 chr20  550000  675000     1
-## 4 chr20  675000 1125000     1
-## 5 chr20 1125000 1475000     1</code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">z_filt</span><span class="op">$</span><span class="va">Level_1</span><span class="op">)</span></pre></div>
-<pre><code>## [1] 141   4</code></pre>
-<p>We can see that TADs found using this method are generally more fine than those found using the silhouette score based filtering. Z-score filtering is more suited for people not interested in TAD hierarchies because the initial TADs detected are less broad than those by quality filtering.</p>
+<div class="section level5">
+<h5 id="working-with-hic-pro-files">Working with HiC-Pro files<a class="anchor" aria-label="anchor" href="#working-with-hic-pro-files"></a>
+</h5>
+<p>HiC-Pro data comes with 2 files, the <code>.matrix</code> file and
+the <code>.bed</code> file. The <code>.matrix</code> file is a 3-column
+matrix where instead of coordinates as the 1st and 2nd column, there is
+an ID. The <code>.bed</code> file maps these IDs to genomic coordinates.
+The steps for analyzing these files is shown below:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Read in both files</span></span>
+<span><span class="va">mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="st">"amyg_100000.matrix"</span><span class="op">)</span></span>
+<span><span class="va">bed</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="st">"amyg_100000_abs.bed"</span><span class="op">)</span></span>
+<span><span class="co">#Convert to modified bed format</span></span>
+<span><span class="va">sparse_mats</span> <span class="op">=</span> <span class="fu">HiCcompare</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HiCcompare/man/hicpro2bedpe.html" class="external-link">hicpro2bedpe</a></span><span class="op">(</span><span class="va">mat</span>,<span class="va">bed</span><span class="op">)</span></span>
+<span><span class="co">#Remove empty matrices if necessary</span></span>
+<span><span class="co">#sparse_mats$cis = sparse_mats$cis[sapply(sparse_mats, nrow) != 0]</span></span>
+<span><span class="co">#Go through all matrices</span></span>
+<span><span class="va">sparse_tads</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">sparse_mats</span><span class="op">$</span><span class="va">cis</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co">#Pull out chromosome</span></span>
+<span>  <span class="va">chr</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="co">#Subset to make three column matrix</span></span>
+<span>  <span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">5</span>,<span class="fl">7</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="co">#Run SpectralTAD</span></span>
+<span>  <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">x</span>, chr<span class="op">=</span><span class="va">chr</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
-<div id="finding-hierarchical-tads" class="section level2">
-<h2 class="hasAnchor">
-<a href="#finding-hierarchical-tads" class="anchor"></a>Finding hierarchical TADS</h2>
-<p>Our method is specifically designed to find hierarchical TADs. To do so, users must specify how many levels they are interested in using the <code>levels</code> parameter. There is no limit to the number of levels but after a certain point no new TADs will be found due to limitations in TAD size or TAD quality. Hierarchies are found by running the algorithm initially and then iteratively running it on sub-TADs until none can be found. At the levels below the initial level we use z-score filtering by default.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit">
-<span class="co">#Running SpectralTAD with 3 levels and no quality filtering</span>
-<span class="va">spec_hier</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, levels <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit">
-<span class="co">#Level 1 remains unchanged</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">spec_hier</span><span class="op">$</span><span class="va">Level_1</span>,<span class="fl">5</span><span class="op">)</span></pre></div>
-<pre><code>## # A tibble: 5 x 4
-##   chr     start     end Level
-##   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
-## 1 chr20   50000  325000     1
-## 2 chr20  325000  525000     1
-## 3 chr20  525000  725000     1
-## 4 chr20  725000 1200000     1
-## 5 chr20 1200000 1450000     1</code></pre>
-<div class="sourceCode" id="cb31"><pre class="downlit">
-<span class="co">#Level 2 contains the sub-TADs for level 1</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">spec_hier</span><span class="op">$</span><span class="va">Level_2</span>,<span class="fl">5</span><span class="op">)</span></pre></div>
-<pre><code>## # A tibble: 5 x 4
-##   chr     start     end Level
-##   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
-## 1 chr20  325000  525000     2
-## 2 chr20  525000  725000     2
-## 3 chr20 1200000 1450000     2
-## 4 chr20 1450000 1750000     2
-## 5 chr20 1775000 1975000     2</code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit">
-<span class="co">#Level 3 contains even finer sub-TADs for level 1 and level 2</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">spec_hier</span><span class="op">$</span><span class="va">Level_3</span>,<span class="fl">5</span><span class="op">)</span></pre></div>
-<pre><code>## # A tibble: 5 x 4
-##   chr     start     end Level
-##   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
-## 1 chr20  325000  525000     3
-## 2 chr20  525000  725000     3
-## 3 chr20 1200000 1450000     3
-## 4 chr20 1775000 1975000     3
-## 5 chr20 1975000 2175000     3</code></pre>
-<p>Note that as we move down levels, more gaps form indicating regions where sub-TADs are not present.</p>
 </div>
-<div id="removing-gaps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#removing-gaps" class="anchor"></a>Removing gaps</h2>
-<p>Though, it has been shown that windowed spectral clustering is more robust to sparsity than other common methods<span class="citation">(Cresswell, Stansfield, and Dozmorov 2019)</span>, there is still some instability caused by consecutive regions of gaps. To counter this, we use a <code>gap_threshold</code> parameter to allow users to exclude regions based on how many zeros are included. By default this value is set to 1 which means only columns/rows with 100% of values being zero are removed before analysis. Accordingly, setting this value to .7 would mean rows/columns with 70% zeros would be removed. Since we are not interested in long-range contacts for TAD identification, this percentage only applies to the number of zeros within a specific distance of the diagonal (Defined by the maximum TAD size). Users must be careful not to filter too much as this can remove informative regions of the matrix.</p>
+<div class="section level3">
+<h3 id="running-spectraltad">Running SpectralTAD<a class="anchor" aria-label="anchor" href="#running-spectraltad"></a>
+</h3>
+<p>Once matrices are in an acceptable format, SpectralTAD can be run
+with as little as two parameters or as many as eight. Below we show how
+to run the algorithm with just TAD detection and no quality
+filtering.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Get the rao contact matrix built into the package</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##       V1     V2   V3</span></span>
+<span><span class="co">## 1  50000  50000 2021</span></span>
+<span><span class="co">## 2  50000  75000  727</span></span>
+<span><span class="co">## 3  75000  75000 3701</span></span>
+<span><span class="co">## 4  50000 100000  203</span></span>
+<span><span class="co">## 5  75000 100000  583</span></span>
+<span><span class="co">## 6 100000 100000 2023</span></span></code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#We see that this is a sparse 3-column contact matrix</span></span>
+<span><span class="co">#Running the algorithm with resolution specified</span></span>
+<span><span class="va">results</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#Printing the top 5 TADs</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">Level_1</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">##   chr     start     end Level</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> chr20   <span style="text-decoration: underline;">50</span>000  <span style="text-decoration: underline;">325</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> chr20  <span style="text-decoration: underline;">325</span>000  <span style="text-decoration: underline;">525</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> chr20  <span style="text-decoration: underline;">525</span>000  <span style="text-decoration: underline;">725</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> chr20  <span style="text-decoration: underline;">725</span>000 1<span style="text-decoration: underline;">200</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> chr20 1<span style="text-decoration: underline;">200</span>000 1<span style="text-decoration: underline;">450</span>000     1</span></span></code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Repeating without specifying resolution</span></span>
+<span><span class="va">no_res</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#We can see below that resolution can be estimated automatically if necessary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">results</span>, <span class="va">no_res</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
-<div id="running-spectraltad-with-parallelization" class="section level2">
-<h2 class="hasAnchor">
-<a href="#running-spectraltad-with-parallelization" class="anchor"></a>Running SpectralTAD with parallelization</h2>
-<p>It is sometimes the case that people want to run SpectralTAD on multiple chromosomes at once in parallel. This can be done using the <code>SpectralTAD_Par</code> function. SpectralTAD_Par is identical to SpectralTAD but takes a list of contact matrices as an input. These matrices can be of any of the allowable types and mixing of types is allowed. Users are required to provide a vector of chromosomes, <code>chr_over</code>, where it is ordered such that each entry matches up with its corresponding contact matrix in the list of matrices. Users can also input list names using the <code>labels</code> parameter. In terms of parallelization, users can either input the number of cores they would like to use or the function will automatically use 1 less than the total number of cores on the computer on which it is ran. The function works on Linux/Mac and Windows with automatic OS detection built in. We show the steps below.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit">
-<span class="co">#Creating replicates of our HiC data for demonstration</span>
-<span class="va">cont_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">3</span>,<span class="va">rao_chr20_25_rep</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#Creating a vector of chromosomes</span>
-<span class="va">chr_over</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"chr20"</span>, <span class="st">"chr20"</span>, <span class="st">"chr20"</span><span class="op">)</span>
-<span class="co">#Creating a list of labels</span>
-<span class="va">labels</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Replicate 1"</span>, <span class="st">"Replicate 2"</span>, <span class="st">"Replicate 3"</span><span class="op">)</span>
-<span class="fu"><a href="../reference/SpectralTAD_Par.html">SpectralTAD_Par</a></span><span class="op">(</span>cont_list <span class="op">=</span> <span class="va">cont_list</span>, chr_over <span class="op">=</span> <span class="va">chr_over</span>, labels <span class="op">=</span> <span class="va">labels</span>, cores <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></pre></div>
+<div class="section level3">
+<h3 id="filtering-tads">Filtering TADs<a class="anchor" aria-label="anchor" href="#filtering-tads"></a>
+</h3>
+<div class="section level4">
+<h4 id="silhouette-score-filtering">Silhouette score filtering<a class="anchor" aria-label="anchor" href="#silhouette-score-filtering"></a>
+</h4>
+<p>One method for filtering TADs is using group-wise silhouette scores.
+This is done by getting the overall silhouette for each group and
+removing those with a score of less than .25. A low silhouette score for
+a given TAD indicates a poor level of connectivity within it.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Running SpectralTAD with silhouette score filtering</span></span>
+<span><span class="va">qual_filt</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">TRUE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span>, resolution <span class="op">=</span> <span class="fl">25000</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Showing quality filtered results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">qual_filt</span><span class="op">$</span><span class="va">Level_1</span>,<span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
+<span><span class="co">##   chr     start     end Sil_Score Level</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> chr20   <span style="text-decoration: underline;">50</span>000  <span style="text-decoration: underline;">325</span>000     0.475     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> chr20  <span style="text-decoration: underline;">325</span>000  <span style="text-decoration: underline;">525</span>000     0.699     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> chr20  <span style="text-decoration: underline;">525</span>000  <span style="text-decoration: underline;">725</span>000     0.640     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> chr20  <span style="text-decoration: underline;">725</span>000 1<span style="text-decoration: underline;">200</span>000     0.384     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> chr20 1<span style="text-decoration: underline;">200</span>000 1<span style="text-decoration: underline;">450</span>000     0.676     1</span></span></code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Quality filtering generally has different dimensions</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">qual_filt</span><span class="op">$</span><span class="va">Level_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 163   5</span></span></code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">Level_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 165   4</span></span></code></pre>
+<p>The results when using the quality filtering option are altered to
+include a new column called <code>Sil_Score</code>. This column includes
+a group-wise silhouette score. In this example a single TAD was removed
+due to having poor organization (Low silhouette score).</p>
 </div>
-<div id="effect-of-matrix-type-on-runtime" class="section level2">
-<h2 class="hasAnchor">
-<a href="#effect-of-matrix-type-on-runtime" class="anchor"></a>Effect of matrix type on runtime</h2>
-<p>The type of matrix input into the algorithm can affect runtimes for the algorithm. <span class="math inline">\(n \times n\)</span> matrices require no conversion and are the fastest. Meanwhile, <span class="math inline">\(n \times (n+3)\)</span> matrices take slightly longer to run due to the need to remove the first 3 columns. Sparse 3-column matrices have the highest runtimes due to the complexity of converting them to an <span class="math inline">\(n \times n\)</span> matrix. The times are summarized below, holding all other parameters constant.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/">microbenchmark</a></span><span class="op">)</span>
-<span class="co">#Converting to nxn</span>
-<span class="va">n_n</span> <span class="op">=</span> <span class="fu">HiCcompare</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HiCcompare/man/sparse2full.html">sparse2full</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span>
-<span class="co">#Converting to nxn+3</span>
-<span class="va">n_n_3</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span><span class="st">"chr20"</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">n_n</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">n_n</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fl">25000</span>, <span class="va">n_n</span><span class="op">)</span>
-<span class="co">#Defining each function</span>
-<span class="va">sparse</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit">
-<span class="va">n_by_n</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit">
-<span class="va">n_by_n_3</span> <span class="op">=</span><span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n_3</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit">
-<span class="co">#Benchmarking different parameters</span>
-<span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html">microbenchmark</a></span><span class="op">(</span>sparse <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,
-n_by_n <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,
-n_by_n_3 <span class="op">=</span><span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n_3</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, unit <span class="op">=</span> <span class="st">"s"</span>, times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<pre><code>## Unit: seconds
-##      expr      min       lq     mean   median       uq      max neval cld
-##    sparse 1.837990 2.052099 2.150791 2.266207 2.307191 2.348176     3   b
-##    n_by_n 1.444342 1.512471 1.571528 1.580599 1.635121 1.689643     3  a 
-##  n_by_n_3 1.480708 1.486806 1.506664 1.492905 1.519642 1.546379     3  a</code></pre>
+<div class="section level4">
+<h4 id="z-score-filtering">Z-score filtering<a class="anchor" aria-label="anchor" href="#z-score-filtering"></a>
+</h4>
+<p>Z-score filtering is based on observations about the log-normality of
+the distance between eigenvector gaps from <span class="citation">(Cresswell, Stansfield, and Dozmorov 2019)</span>.
+Z-score filtering bypasses the uses of silhouette score and defines a
+TAD boundary as the area between consecutive regions where the z-score
+of the eigenvector gap is greater than 2.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">z_filt</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">TRUE</span>, resolution <span class="op">=</span> <span class="fl">25000</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">z_filt</span><span class="op">$</span><span class="va">Level_1</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">##   chr     start     end Level</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> chr20   <span style="text-decoration: underline;">50</span>000  <span style="text-decoration: underline;">350</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> chr20  <span style="text-decoration: underline;">350</span>000  <span style="text-decoration: underline;">550</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> chr20  <span style="text-decoration: underline;">550</span>000  <span style="text-decoration: underline;">675</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> chr20  <span style="text-decoration: underline;">675</span>000 1<span style="text-decoration: underline;">125</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> chr20 1<span style="text-decoration: underline;">125</span>000 1<span style="text-decoration: underline;">475</span>000     1</span></span></code></pre>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">z_filt</span><span class="op">$</span><span class="va">Level_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 141   4</span></span></code></pre>
+<p>We can see that TADs found using this method are generally more fine
+than those found using the silhouette score based filtering. Z-score
+filtering is more suited for people not interested in TAD hierarchies
+because the initial TADs detected are less broad than those by quality
+filtering.</p>
 </div>
-<div id="effect-of-parameters-on-runtime" class="section level2">
-<h2 class="hasAnchor">
-<a href="#effect-of-parameters-on-runtime" class="anchor"></a>Effect of parameters on runtime</h2>
-<p>Just as the type of data affects runtime, the parameters used to detect TADs do as well. The main bottleneck is the quality filter function which requires the inversion of a matrix and the calculation of silhouette score.</p>
-<div class="sourceCode" id="cb45"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html">microbenchmark</a></span><span class="op">(</span>quality_filter <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">TRUE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, no_filter <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, z_clust <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">3</span>, unit <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></pre></div>
-<pre><code>## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.
-
-## Warning: Unknown or uninitialised column: `Group`.</code></pre>
-<pre><code>## Unit: seconds
-##            expr       min        lq      mean    median        uq       max neval cld
-##  quality_filter 1.5070191 1.5120035 1.5138437 1.5169878 1.5172561 1.5175243     3   c
-##       no_filter 1.3930107 1.3983699 1.4042129 1.4037292 1.4098141 1.4158990     3  b 
-##         z_clust 0.9558489 0.9592804 0.9623181 0.9627119 0.9655528 0.9683937     3 a</code></pre>
+</div>
+<div class="section level3">
+<h3 id="finding-hierarchical-tads">Finding hierarchical TADS<a class="anchor" aria-label="anchor" href="#finding-hierarchical-tads"></a>
+</h3>
+<p>Our method is specifically designed to find hierarchical TADs. To do
+so, users must specify how many levels they are interested in using the
+<code>levels</code> parameter. There is no limit to the number of levels
+but after a certain point no new TADs will be found due to limitations
+in TAD size or TAD quality. Hierarchies are found by running the
+algorithm initially and then iteratively running it on sub-TADs until
+none can be found. At the levels below the initial level we use z-score
+filtering by default.</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Running SpectralTAD with 3 levels and no quality filtering</span></span>
+<span><span class="va">spec_hier</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, levels <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Level 1 remains unchanged</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spec_hier</span><span class="op">$</span><span class="va">Level_1</span>,<span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">##   chr     start     end Level</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> chr20   <span style="text-decoration: underline;">50</span>000  <span style="text-decoration: underline;">325</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> chr20  <span style="text-decoration: underline;">325</span>000  <span style="text-decoration: underline;">525</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> chr20  <span style="text-decoration: underline;">525</span>000  <span style="text-decoration: underline;">725</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> chr20  <span style="text-decoration: underline;">725</span>000 1<span style="text-decoration: underline;">200</span>000     1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> chr20 1<span style="text-decoration: underline;">200</span>000 1<span style="text-decoration: underline;">450</span>000     1</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Level 2 contains the sub-TADs for level 1</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spec_hier</span><span class="op">$</span><span class="va">Level_2</span>,<span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">##   chr     start     end Level</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> chr20  <span style="text-decoration: underline;">325</span>000  <span style="text-decoration: underline;">525</span>000     2</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> chr20  <span style="text-decoration: underline;">525</span>000  <span style="text-decoration: underline;">725</span>000     2</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> chr20 1<span style="text-decoration: underline;">200</span>000 1<span style="text-decoration: underline;">450</span>000     2</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> chr20 1<span style="text-decoration: underline;">450</span>000 1<span style="text-decoration: underline;">750</span>000     2</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> chr20 1<span style="text-decoration: underline;">775</span>000 1<span style="text-decoration: underline;">975</span>000     2</span></span></code></pre>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Level 3 contains even finer sub-TADs for level 1 and level 2</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spec_hier</span><span class="op">$</span><span class="va">Level_3</span>,<span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">##   chr     start     end Level</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> chr20  <span style="text-decoration: underline;">325</span>000  <span style="text-decoration: underline;">525</span>000     3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> chr20  <span style="text-decoration: underline;">525</span>000  <span style="text-decoration: underline;">725</span>000     3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> chr20 1<span style="text-decoration: underline;">200</span>000 1<span style="text-decoration: underline;">450</span>000     3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> chr20 1<span style="text-decoration: underline;">775</span>000 1<span style="text-decoration: underline;">975</span>000     3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> chr20 1<span style="text-decoration: underline;">975</span>000 2<span style="text-decoration: underline;">175</span>000     3</span></span></code></pre>
+<p>Note that as we move down levels, more gaps form indicating regions
+where sub-TADs are not present.</p>
+</div>
+<div class="section level3">
+<h3 id="removing-gaps">Removing gaps<a class="anchor" aria-label="anchor" href="#removing-gaps"></a>
+</h3>
+<p>Though, it has been shown that windowed spectral clustering is more
+robust to sparsity than other common methods<span class="citation">(Cresswell, Stansfield, and Dozmorov 2019)</span>,
+there is still some instability caused by consecutive regions of gaps.
+To counter this, we use a <code>gap_threshold</code> parameter to allow
+users to exclude regions based on how many zeros are included. By
+default this value is set to 1 which means only columns/rows with 100%
+of values being zero are removed before analysis. Accordingly, setting
+this value to .7 would mean rows/columns with 70% zeros would be
+removed. Since we are not interested in long-range contacts for TAD
+identification, this percentage only applies to the number of zeros
+within a specific distance of the diagonal (Defined by the maximum TAD
+size). Users must be careful not to filter too much as this can remove
+informative regions of the matrix.</p>
+</div>
+<div class="section level3">
+<h3 id="running-spectraltad-with-parallelization">Running SpectralTAD with parallelization<a class="anchor" aria-label="anchor" href="#running-spectraltad-with-parallelization"></a>
+</h3>
+<p>It is sometimes the case that people want to run SpectralTAD on
+multiple chromosomes at once in parallel. This can be done using the
+<code>SpectralTAD_Par</code> function. SpectralTAD_Par is identical to
+SpectralTAD but takes a list of contact matrices as an input. These
+matrices can be of any of the allowable types and mixing of types is
+allowed. Users are required to provide a vector of chromosomes,
+<code>chr_over</code>, where it is ordered such that each entry matches
+up with its corresponding contact matrix in the list of matrices. Users
+can also input list names using the <code>labels</code> parameter. In
+terms of parallelization, users can either input the number of cores
+they would like to use or the function will automatically use 1 less
+than the total number of cores on the computer on which it is ran. The
+function works on Linux/Mac and Windows with automatic OS detection
+built in. We show the steps below.</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Creating replicates of our HiC data for demonstration</span></span>
+<span><span class="va">cont_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="fl">3</span>,<span class="va">rao_chr20_25_rep</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#Creating a vector of chromosomes</span></span>
+<span><span class="va">chr_over</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chr20"</span>, <span class="st">"chr20"</span>, <span class="st">"chr20"</span><span class="op">)</span></span>
+<span><span class="co">#Creating a list of labels</span></span>
+<span><span class="va">labels</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Replicate 1"</span>, <span class="st">"Replicate 2"</span>, <span class="st">"Replicate 3"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/SpectralTAD_Par.html">SpectralTAD_Par</a></span><span class="op">(</span>cont_list <span class="op">=</span> <span class="va">cont_list</span>, chr_over <span class="op">=</span> <span class="va">chr_over</span>, labels <span class="op">=</span> <span class="va">labels</span>, cores <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="effect-of-matrix-type-on-runtime">Effect of matrix type on runtime<a class="anchor" aria-label="anchor" href="#effect-of-matrix-type-on-runtime"></a>
+</h3>
+<p>The type of matrix input into the algorithm can affect runtimes for
+the algorithm. <span class="math inline">\(n \times n\)</span> matrices
+require no conversion and are the fastest. Meanwhile, <span class="math inline">\(n \times (n+3)\)</span> matrices take slightly
+longer to run due to the need to remove the first 3 columns. Sparse
+3-column matrices have the highest runtimes due to the complexity of
+converting them to an <span class="math inline">\(n \times n\)</span>
+matrix. The times are summarized below, holding all other parameters
+constant.</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
+<span><span class="co">#Converting to nxn</span></span>
+<span><span class="va">n_n</span> <span class="op">=</span> <span class="fu">HiCcompare</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/HiCcompare/man/sparse2full.html" class="external-link">sparse2full</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span></span>
+<span><span class="co">#Converting to nxn+3</span></span>
+<span><span class="va">n_n_3</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="st">"chr20"</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">n_n</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">n_n</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fl">25000</span>, <span class="va">n_n</span><span class="op">)</span></span>
+<span><span class="co">#Defining each function</span></span>
+<span><span class="va">sparse</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">n_by_n</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">n_by_n_3</span> <span class="op">=</span><span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n_3</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Benchmarking different parameters</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span>sparse <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>n_by_n <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>n_by_n_3 <span class="op">=</span><span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n_3</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, unit <span class="op">=</span> <span class="st">"s"</span>, times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<pre><code><span><span class="co">## Unit: seconds</span></span>
+<span><span class="co">##      expr      min       lq     mean   median       uq      max neval cld</span></span>
+<span><span class="co">##    sparse 2.430919 2.584816 2.646947 2.738712 2.754962 2.771211     3   b</span></span>
+<span><span class="co">##    n_by_n 1.997112 2.039997 2.057929 2.082882 2.088338 2.093794     3  a </span></span>
+<span><span class="co">##  n_by_n_3 1.980063 1.982114 2.121178 1.984166 2.191736 2.399307     3  a</span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="effect-of-parameters-on-runtime">Effect of parameters on runtime<a class="anchor" aria-label="anchor" href="#effect-of-parameters-on-runtime"></a>
+</h3>
+<p>Just as the type of data affects runtime, the parameters used to
+detect TADs do as well. The main bottleneck is the quality filter
+function which requires the inversion of a matrix and the calculation of
+silhouette score.</p>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span>quality_filter <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">TRUE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, no_filter <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, z_clust <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span>cont_mat <span class="op">=</span> <span class="va">n_n</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, z_clust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">3</span>, unit <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span>
+<span><span class="co">## Unknown or uninitialised column: `Group`.</span></span></code></pre>
+<pre><code><span><span class="co">## Unit: seconds</span></span>
+<span><span class="co">##            expr      min       lq     mean   median       uq      max neval cld</span></span>
+<span><span class="co">##  quality_filter 2.041887 2.128730 2.285750 2.215574 2.407682 2.599790     3   b</span></span>
+<span><span class="co">##       no_filter 1.933747 1.975305 2.016547 2.016863 2.057947 2.099031     3   b</span></span>
+<span><span class="co">##         z_clust 1.481140 1.501573 1.508435 1.522006 1.522083 1.522160     3  a</span></span></code></pre>
 <p>As can be seen using the z-score method is the fastest.</p>
 </div>
-<div id="using-spectraltad-output-with-hicexplorer-and-juicebox" class="section level2">
-<h2 class="hasAnchor">
-<a href="#using-spectraltad-output-with-hicexplorer-and-juicebox" class="anchor"></a>Using SpectralTAD output with HiCExplorer and Juicebox</h2>
-<p>SpectralTAD is designed to work in tandem with Juicebox (<a href="http://www.aidenlab.org/juicebox/" class="uri">http://www.aidenlab.org/juicebox/</a>) and HiCExplorer (<a href="https://hicexplorer.usegalaxy.eu/" class="uri">https://hicexplorer.usegalaxy.eu/</a>), two popular TAD visualization tools. Users may output files, corresponding to either tools.</p>
-<div id="using-spectraltad-with-hicexplorer" class="section level3">
-<h3 class="hasAnchor">
-<a href="#using-spectraltad-with-hicexplorer" class="anchor"></a>Using SpectralTAD with HiCExplorer</h3>
-<p>HiCExplorer takes simple bed files. To use SpectralTAD with HiCExplorer, do the following:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit">
-<span class="co">#Get contact matrix</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span>
-<span class="co">#Run spectral TAD with output format "hicexplorer" or "bed" and specify the path</span>
-<span class="va">spec_hier</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, levels <span class="op">=</span> <span class="fl">3</span>, out_format <span class="op">=</span> <span class="st">"hicexplorer"</span>, out_path <span class="op">=</span> <span class="st">"chr20.bed"</span><span class="op">)</span></pre></div>
-<p>This code will output a three-column bed file with TAD coordinates for all three levels. hicPlotTADs from HiCExplorer takes a .ini configuration file. To use SpectralTAD results you simply just have to set the output file as the directory under the [tads] subheading. For a full walk-through see (<a href="https://hicexplorer.readthedocs.io/en/latest/content/tools/hicPlotTADs.html#id4" class="uri">https://hicexplorer.readthedocs.io/en/latest/content/tools/hicPlotTADs.html#id4</a>) under the heading “Configuration file template.”</p>
+<div class="section level3">
+<h3 id="using-spectraltad-output-with-hicexplorer-and-juicebox">Using SpectralTAD output with HiCExplorer and Juicebox<a class="anchor" aria-label="anchor" href="#using-spectraltad-output-with-hicexplorer-and-juicebox"></a>
+</h3>
+<p>SpectralTAD is designed to work in tandem with Juicebox (<a href="http://www.aidenlab.org/juicebox/" class="external-link uri">http://www.aidenlab.org/juicebox/</a>) and HiCExplorer (<a href="https://hicexplorer.usegalaxy.eu/" class="external-link uri">https://hicexplorer.usegalaxy.eu/</a>), two popular TAD
+visualization tools. Users may output files, corresponding to either
+tools.</p>
+<div class="section level4">
+<h4 id="using-spectraltad-with-hicexplorer">Using SpectralTAD with HiCExplorer<a class="anchor" aria-label="anchor" href="#using-spectraltad-with-hicexplorer"></a>
+</h4>
+<p>HiCExplorer takes simple bed files. To use SpectralTAD with
+HiCExplorer, do the following:</p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Get contact matrix</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span></span>
+<span><span class="co">#Run spectral TAD with output format "hicexplorer" or "bed" and specify the path</span></span>
+<span><span class="va">spec_hier</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, levels <span class="op">=</span> <span class="fl">3</span>, out_format <span class="op">=</span> <span class="st">"hicexplorer"</span>, out_path <span class="op">=</span> <span class="st">"chr20.bed"</span><span class="op">)</span></span></code></pre></div>
+<p>This code will output a three-column bed file with TAD coordinates
+for all three levels. hicPlotTADs from HiCExplorer takes a .ini
+configuration file. To use SpectralTAD results you simply just have to
+set the output file as the directory under the [tads] subheading. For a
+full walk-through see (<a href="https://hicexplorer.readthedocs.io/en/latest/content/tools/hicPlotTADs.html#id4" class="external-link uri">https://hicexplorer.readthedocs.io/en/latest/content/tools/hicPlotTADs.html#id4</a>)
+under the heading “Configuration file template.”</p>
 </div>
-<div id="using-spectraltad-with-juicebox" class="section level3">
-<h3 class="hasAnchor">
-<a href="#using-spectraltad-with-juicebox" class="anchor"></a>Using SpectralTAD with Juicebox</h3>
-<p>Juicebox takes bedpe files as its primary file type. To use SpectralTAD with Juicebox, do the following:</p>
-<div class="sourceCode" id="cb49"><pre class="downlit">
-<span class="co">#Get contact matrix</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span>
-<span class="co">#Run spectral TAD with output format "hicexplorer" or "bed" and specify the path</span>
-<span class="va">spec_hier</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, levels <span class="op">=</span> <span class="fl">3</span>, out_format <span class="op">=</span> <span class="st">"juicebox"</span>, out_path <span class="op">=</span> <span class="st">"chr20.bedpe"</span><span class="op">)</span></pre></div>
-<p>The output for this code is an 11-column bedpe file, which is formatted to work for Juicebox. To use the file, you must first select a HiC matrix in the Juicebox interface (<a href="https://www.aidenlab.org/juicebox/" class="uri">https://www.aidenlab.org/juicebox/</a>). This is done by choosing <code>Load Map -&gt; Select File -&gt; Select Contact Map</code>. This data corresponds to <code>Rao and Huntley et al. | Cell 2014 GM12878 (human) in situ ENCODE Batch 1 HIC048</code> so we select this. Alternatively, you can upload your own hic matrix in .hic or .cool format. To select the TADs called by <code>SpectralTAD</code> simply choose <code>Load Tracks -&gt; Local Track File -&gt; Choose File -&gt; chr20.bedpe</code>. To view chromosome 20 specifically, select <code>≡ -&gt; Chromosomes -&gt; chr20</code>.</p>
+<div class="section level4">
+<h4 id="using-spectraltad-with-juicebox">Using SpectralTAD with Juicebox<a class="anchor" aria-label="anchor" href="#using-spectraltad-with-juicebox"></a>
+</h4>
+<p>Juicebox takes bedpe files as its primary file type. To use
+SpectralTAD with Juicebox, do the following:</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Get contact matrix</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span><span class="op">)</span></span>
+<span><span class="co">#Run spectral TAD with output format "hicexplorer" or "bed" and specify the path</span></span>
+<span><span class="va">spec_hier</span> <span class="op">=</span> <span class="fu"><a href="../reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, resolution <span class="op">=</span> <span class="fl">25000</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span>, levels <span class="op">=</span> <span class="fl">3</span>, out_format <span class="op">=</span> <span class="st">"juicebox"</span>, out_path <span class="op">=</span> <span class="st">"chr20.bedpe"</span><span class="op">)</span></span></code></pre></div>
+<p>The output for this code is an 11-column bedpe file, which is
+formatted to work for Juicebox. To use the file, you must first select a
+HiC matrix in the Juicebox interface (<a href="https://www.aidenlab.org/juicebox/" class="external-link uri">https://www.aidenlab.org/juicebox/</a>). This is done by
+choosing
+<code>Load Map -&gt; Select File -&gt; Select Contact Map</code>. This
+data corresponds to
+<code>Rao and Huntley et al. | Cell 2014 GM12878 (human) in situ ENCODE Batch 1 HIC048</code>
+so we select this. Alternatively, you can upload your own hic matrix in
+.hic or .cool format. To select the TADs called by
+<code>SpectralTAD</code> simply choose
+<code>Load Tracks -&gt; Local Track File -&gt; Choose File -&gt; chr20.bedpe</code>.
+To view chromosome 20 specifically, select
+<code>≡ -&gt; Chromosomes -&gt; chr20</code>.</p>
 </div>
 </div>
 </div>
-<div id="references" class="section level1 unnumbered">
-<h1 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h1>
-<div id="refs" class="references hanging-indent">
-<div id="ref-cresswell:2019aa">
-<p>Cresswell, Kellen G, John C Stansfield, and Mikhail G Dozmorov. 2019. “SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering,” February. <a href="https://doi.org/10.1101/549170">https://doi.org/10.1101/549170</a>.</p>
+<div class="section level2">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-cresswell:2019aa" class="csl-entry">
+Cresswell, Kellen G, John C Stansfield, and Mikhail G Dozmorov. 2019.
+<span>“<span>SpectralTAD</span>: An r Package for Defining a Hierarchy
+of Topologically Associated Domains Using Spectral Clustering,”</span>
+February. <a href="https://doi.org/10.1101/549170" class="external-link">https://doi.org/10.1101/549170</a>.
 </div>
-<div id="ref-Durand:2016aa">
-<p>Durand, Neva C., Muhammad S. Shamim, Ido Machol, Suhas S. P. Rao, Miriam H. Huntley, Eric S. Lander, and Erez Lieberman Aiden. 2016. “Juicer Provides a One-Click System for Analyzing Loop-Resolution Hi-c Experiments.” <em>Cell Systems</em> 3 (1): 95–98. <a href="https://doi.org/10.1016/j.cels.2016.07.002">https://doi.org/10.1016/j.cels.2016.07.002</a>.</p>
+<div id="ref-Durand:2016aa" class="csl-entry">
+Durand, Neva C., Muhammad S. Shamim, Ido Machol, Suhas S. P. Rao, Miriam
+H. Huntley, Eric S. Lander, and Erez Lieberman Aiden. 2016.
+<span>“Juicer Provides a One-Click System for Analyzing Loop-Resolution
+Hi-c Experiments.”</span> <em>Cell Systems</em> 3 (1): 95–98. <a href="https://doi.org/10.1016/j.cels.2016.07.002" class="external-link">https://doi.org/10.1016/j.cels.2016.07.002</a>.
 </div>
-<div id="ref-Rao:2014aa">
-<p>Rao, Suhas S.P., Miriam H. Huntley, Neva C. Durand, Elena K. Stamenova, Ivan D. Bochkov, James T. Robinson, Adrian L. Sanborn, et al. 2014. “A 3D Map of the Human Genome at Kilobase Resolution Reveals Principles of Chromatin Looping.” <em>Cell</em> 159 (7): 1665–80. <a href="https://doi.org/10.1016/j.cell.2014.11.021">https://doi.org/10.1016/j.cell.2014.11.021</a>.</p>
+<div id="ref-Rao:2014aa" class="csl-entry">
+Rao, Suhas S.P., Miriam H. Huntley, Neva C. Durand, Elena K. Stamenova,
+Ivan D. Bochkov, James T. Robinson, Adrian L. Sanborn, et al. 2014.
+<span>“A 3D Map of the Human Genome at Kilobase Resolution Reveals
+Principles of Chromatin Looping.”</span> <em>Cell</em> 159 (7): 1665–80.
+<a href="https://doi.org/10.1016/j.cell.2014.11.021" class="external-link">https://doi.org/10.1016/j.cell.2014.11.021</a>.
 </div>
 </div>
 </div>
@@ -1152,11 +985,13 @@ n_by_n_3 <span class="op">=</span><span class="fu"><a href="../reference/Spectra
 
 
       <footer><div class="copyright">
-  <p>Developed by Kellen Cresswell.</p>
+  <p></p>
+<p>Developed by Mikhail Dozmorov, Kellen Cresswell, John Stansfield.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -1164,6 +999,8 @@ n_by_n_3 <span class="op">=</span><span class="fu"><a href="../reference/Spectra
 
   
 
+
+  
 
   </body>
 </html>

@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SpectralTAD</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/SpectralTAD.html">Get started</a>
 </li>
@@ -59,8 +55,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/dozmorovlab/SpectralTAD/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/dozmorovlab/SpectralTAD/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -77,41 +73,41 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="spectraltad" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#spectraltad" class="anchor"></a>SpectralTAD</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="spectraltad">SpectralTAD<a class="anchor" aria-label="anchor" href="#spectraltad"></a>
+</h1></div>
 <!-- badges: start -->
 
-<p>Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “<a href="https://doi.org/10.1186/s12859-020-03652-w">SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering</a>.” BMC Bioinformatics 21, no. 1 (December 2020): 319.</p>
-<p><code>SpectralTAD</code> is a TAD caller that uses a modified form of spectral clustering to quickly identify hierarchical topologically associating domains (TADs). Users input a contact matrix and receive a <a href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1">BED</a> file containing the coordinates of TADs and their levels in a hierarchy. The Level 1 TADs are generally large, well-defined, while the subsequent levels are less well-pronounced yet sufficiently distinct to be recognized as TADs.</p>
+<p>Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “<a href="https://doi.org/10.1186/s12859-020-03652-w" class="external-link">SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering</a>.” BMC Bioinformatics 21, no. 1 (December 2020): 319.</p>
+<p><code>SpectralTAD</code> is a TAD caller that uses a modified form of spectral clustering to quickly identify hierarchical topologically associating domains (TADs). Users input a contact matrix and receive a <a href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1" class="external-link">BED</a> file containing the coordinates of TADs and their levels in a hierarchy. The Level 1 TADs are generally large, well-defined, while the subsequent levels are less well-pronounced yet sufficiently distinct to be recognized as TADs.</p>
 <p>The two main functions are <code><a href="reference/SpectralTAD.html">SpectralTAD()</a></code> and <code><a href="reference/SpectralTAD_Par.html">SpectralTAD_Par()</a></code>. <code><a href="reference/SpectralTAD.html">SpectralTAD()</a></code> is a function for calling TADs. <code><a href="reference/SpectralTAD_Par.html">SpectralTAD_Par()</a></code> is the parallelized version. The input data can be an n x n, an n x (n+3), or a sparse 3-column matrix (see vignette (`browseVignettes(“SpectralTAD”))</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>If necessary, install the dependencies:</p>
-<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages(c('dplyr', 'PRIMME', 'cluster',
-    'Matrix',
-    'parallel',
-    'magrittr',
-    'HiCcompare'))
-
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
-BiocManager::install('BiocParallel')</a></code></pre>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dplyr'</span>, <span class="st">'PRIMME'</span>, <span class="st">'cluster'</span>,</span>
+<span>    <span class="st">'Matrix'</span>,</span>
+<span>    <span class="st">'parallel'</span>,</span>
+<span>    <span class="st">'magrittr'</span>,</span>
+<span>    <span class="st">'HiCcompare'</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">'BiocParallel'</span><span class="op">)</span></span></code></pre>
 <p>The latest version of <code>SpectralTAD</code> can be directly installed from Github:</p>
-<pre><code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github('cresswellkg/SpectralTAD', build_vignettes = TRUE)
-library(SpectralTAD)</a></code></pre>
+<pre><code><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'cresswellkg/SpectralTAD'</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dozmorovlab/SpectralTAD" class="external-link">SpectralTAD</a></span><span class="op">)</span></span></code></pre>
 <p>Alternatively, the package can be installed from Bioconductor (to be submitted):</p>
-<pre><code>if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
-BiocManager::install("SpectralTAD")
-library(SpectralTAD)</code></pre>
+<pre><code><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"SpectralTAD"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dozmorovlab/SpectralTAD" class="external-link">SpectralTAD</a></span><span class="op">)</span></span></code></pre>
 </div>
-<div id="input" class="section level2">
-<h2 class="hasAnchor">
-<a href="#input" class="anchor"></a>Input</h2>
+<div class="section level2">
+<h2 id="input">Input<a class="anchor" aria-label="anchor" href="#input"></a>
+</h2>
 <p>There are three types of input accepted:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>n x n contact matrices</li>
 <li>n x (n+3) contact matrices</li>
 <li>3-column sparse contact matrices</li>
@@ -119,16 +115,16 @@ library(SpectralTAD)</code></pre>
 <p>These formats are explained in depth in the <a href="vignettes/SpectralTAD.Rmd">vignette</a>.</p>
 </div>
 </div>
-<div id="usage" class="section level1">
-<h1 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h1>
-<div id="multi-level-tads" class="section level2">
-<h2 class="hasAnchor">
-<a href="#multi-level-tads" class="anchor"></a>Multi-Level TADs</h2>
-<pre><code><a href="https://rdrr.io/r/utils/data.html">#Load example contact matrix
-data("rao_chr20_25_rep")
-#Find TADs
-tads = SpectralTAD(rao_chr20_25_rep, chr = "chr20", levels = 2, qual_filter = FALSE)</a></code></pre>
+<div class="section level1">
+<h1 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h1>
+<div class="section level2">
+<h2 id="multi-level-tads">Multi-Level TADs<a class="anchor" aria-label="anchor" href="#multi-level-tads"></a>
+</h2>
+<pre><code><span><span class="co">#Load example contact matrix</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"rao_chr20_25_rep"</span><span class="op">)</span></span>
+<span><span class="co">#Find TADs</span></span>
+<span><span class="va">tads</span> <span class="op">=</span> <span class="fu"><a href="reference/SpectralTAD.html">SpectralTAD</a></span><span class="op">(</span><span class="va">rao_chr20_25_rep</span>, chr <span class="op">=</span> <span class="st">"chr20"</span>, levels <span class="op">=</span> <span class="fl">2</span>, qual_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre>
 <p>The output is a list where each entry corresponds to a level of the TAD hierarchy.</p>
 <p>First level sample output:</p>
 <pre><code>chr     start     end  Level
@@ -143,10 +139,10 @@ chr20  550000  675000     2
 chr20  675000 1200000     2
 chr20 1200000 1750000     2</code></pre>
 </div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor"></a>Citation</h2>
-<p>Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “SpectralTAD: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering.” BMC bioinformatics 21, no. 1 (2020): 1-19. <a href="https://doi.org/10.1186/s12859-020-03652-w" class="uri">https://doi.org/10.1186/s12859-020-03652-w</a></p>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “SpectralTAD: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering.” BMC bioinformatics 21, no. 1 (2020): 1-19. <a href="https://doi.org/10.1186/s12859-020-03652-w" class="external-link uri">https://doi.org/10.1186/s12859-020-03652-w</a></p>
 <pre><code>@article{cresswell2020spectraltad,
   title={SpectralTAD: an R package for defining a hierarchy of Topologically Associated Domains using spectral clustering},
   author={Cresswell, Kellen G and Stansfield, John C and Dozmorov, Mikhail G},
@@ -158,14 +154,14 @@ chr20 1200000 1750000     2</code></pre>
   publisher={Springer}
 }</code></pre>
 </div>
-<div id="contributions--support" class="section level2">
-<h2 class="hasAnchor">
-<a href="#contributions--support" class="anchor"></a>Contributions &amp; Support</h2>
+<div class="section level2">
+<h2 id="contributions--support">Contributions &amp; Support<a class="anchor" aria-label="anchor" href="#contributions--support"></a>
+</h2>
 <p>Suggestions for new features and bug reports are welcome. Please, create a new issue for any of these or contact the author directly: @cresswellkg (cresswellkg[at]vcu[dot]edu)</p>
 </div>
-<div id="contributors" class="section level2">
-<h2 class="hasAnchor">
-<a href="#contributors" class="anchor"></a>Contributors</h2>
+<div class="section level2">
+<h2 id="contributors">Contributors<a class="anchor" aria-label="anchor" href="#contributors"></a>
+</h2>
 <p>Authors: @cresswellkg (cresswellkg[at]vcu[dot]edu) &amp; @mdozmorov (mikhail.dozmorov[at]vcuhealth[dot]org)</p>
 </div>
 </div>
@@ -174,56 +170,62 @@ chr20 1200000 1750000     2</code></pre>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from BIOC at <br><a href="https://www.bioconductor.org/packages/SpectralTAD">https://​www.bioconductor.org/​packages/​SpectralTAD</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/dozmorovlab/SpectralTAD/">https://​github.com/​dozmorovlab/​SpectralTAD/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/dozmorovlab/SpectralTAD/issues">https://​github.com/​dozmorovlab/​SpectralTAD/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
-</li>
-</ul>
-</div>
-<div class="citation">
-<h2>Citation</h2>
-<ul class="list-unstyled">
-<li><a href="authors.html">Citing SpectralTAD</a></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>Kellen Cresswell <br><small class="roles"> Maintainer </small>  </li>
+<li><a href="https://www.bioconductor.org/packages/SpectralTAD" class="external-link">View on Bioconductor</a></li>
+<li><a href="https://github.com/dozmorovlab/SpectralTAD/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/dozmorovlab/SpectralTAD/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://bioconductor.org/checkResults/release/bioc-LATEST/SpectralTAD"><img src="http://www.bioconductor.org/shields/build/release/bioc/SpectralTAD.svg" alt="BioC status"></a></li>
-<li><a href="https://travis-ci.org/cresswellkg/SpectralTAD"><img src="https://travis-ci.org/cresswellkg/SpectralTAD.svg?branch=master" alt="Build Status"></a></li>
-<li><a href="https://www.tidyverse.org/lifecycle/#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
-<li><a href="https://codecov.io/gh/cresswellkg/SpectralTAD?branch=master"><img src="https://codecov.io/gh/cresswellkg/SpectralTAD/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing SpectralTAD</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Mikhail Dozmorov <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0086-8358" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Kellen Cresswell <br><small class="roles"> Author </small>  </li>
+<li>John Stansfield <br><small class="roles"> Author </small>  </li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://bioconductor.org/checkResults/release/bioc-LATEST/SpectralTAD" class="external-link"><img src="http://www.bioconductor.org/shields/build/release/bioc/SpectralTAD.svg" alt="BioC status"></a></li>
+<li><a href="https://travis-ci.org/cresswellkg/SpectralTAD" class="external-link"><img src="https://travis-ci.org/cresswellkg/SpectralTAD.svg?branch=master" alt="Build Status"></a></li>
+<li><a href="https://www.tidyverse.org/lifecycle/#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://codecov.io/gh/cresswellkg/SpectralTAD?branch=master" class="external-link"><img src="https://codecov.io/gh/cresswellkg/SpectralTAD/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Kellen Cresswell.</p>
+  <p></p>
+<p>Developed by Mikhail Dozmorov, Kellen Cresswell, John Stansfield.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -231,6 +233,8 @@ chr20 1200000 1750000     2</code></pre>
 
   
 
+
+  
 
   </body>
 </html>
