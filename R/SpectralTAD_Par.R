@@ -56,7 +56,7 @@
 #' chr = c("chr20", "chr20")
 #' #Make a vector of labels
 #' labels = c("run1", "run2")
-#' spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels)
+#' spec_table <- SpectralTAD_Par(mat_list, chr= chr, labels = labels, cores = 2)
 
 SpectralTAD_Par = function(cont_list, chr, levels = 1,
                            qual_filter = FALSE, 

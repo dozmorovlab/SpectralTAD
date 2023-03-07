@@ -623,8 +623,12 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
       #Remove the last group (To account for overlap across windows) and set new start to start of group
 
+      if (nrow(end_group)!=0) {
       end_IDs = which(end_group$Group == last(end_group$Group))
-
+      } else {
+        end_IDs = 1:window_size
+      }
+      
       start = end-length(end_IDs)+1
 
       #Account for cases when final TAD can't be removed
@@ -635,8 +639,11 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
       #Set new window end
 
+      if (nrow(end_group != 0)) {
       end = start+window_size
-
+      } else {
+      end=start+window_size*2
+}
       #Remove final group to avoid repeating
 
       end_group = end_group[-end_IDs, ]
@@ -695,3 +702,4 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
    
   return(bed)
 }
+
