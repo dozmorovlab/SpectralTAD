@@ -55,12 +55,6 @@
 #' #Find TADs
 #' spec_table <- SpectralTAD(rao_chr20_25_rep, chr= 'chr20')
 
-# library(SpectralTAD)
-# data("rao_chr20_25_rep")
-# cont_mat = rao_chr20_25_rep; chr = "chr20"; levels = 3; resolution = 25000;
-# qual_filter = FALSE; z_clust = FALSE; eigenvalues = 2; min_size = 5;
-# window_size = 25; gap_threshold = 1; grange = FALSE; out_format = "none"; out_path = "chr20"
-# library(dplyr)
 
 SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
                        z_clust = FALSE, eigenvalues = 2, min_size = 5,
@@ -181,51 +175,63 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
   curr_lev = 2
 
   while (curr_lev != (levels + 1) ) {
-    #Get a list of TAD coordinates at the previous level
-    coords = cbind(match(called_tads[[curr_lev-1]]$start, as.numeric(colnames(cont_mat))), match(called_tads[[curr_lev-1]]$end-resolution, as.numeric(colnames(cont_mat))))
-    #Get tads that are less than the twice the minmium length and thus not seperable
-    less_5 = which( (coords[,2]-coords[,1])<min_size*2  )
-  
-    if (length(less_5)>0) {
-    #Remove TADs which cannot be seperate
-    pres_tads = called_tads[[curr_lev-1]][less_5,]
-    coords = coords[-less_5, ]
-    } else {
-      pres_tads = c()
-    }
-  
-    #Account for the situation where there is only 1 potential sub-tad
-    if (is.null(nrow(coords))) {
-      coords = t(as.matrix(coords))
-    }
-    tads = apply(coords, 1, function(x) cont_mat[x[1]:x[2], x[1]:x[2]])
-  
-    # tads should be a list with each element containing two-column data
-    # Sometimes tads is just one-column "matrix" "array" data - skip it
-    if (is.list(tads)) {
-      #Remove sub-tads with too many zeros
-      zeros = which(unlist(lapply(tads, function(x) nrow(x)-sum(rowSums(x)==0)))<min_size*2)
-      
-      if (length(zeros)>0) {
-        pres_tads = rbind(pres_tads, called_tads[[curr_lev-1]][zeros,])
-        tads[zeros] = NULL
-      }
-      
-      #Calculate sub-TADs for each seperable TAD
-      sub_tads = lapply(tads, function(x) {
-        .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = TRUE, min_size = min_size)
-      })
-      
-      #Convert sub-TADs to BED format
-      called_tads[[curr_lev]] = bind_rows(sub_tads, pres_tads) %>% mutate(Level = curr_lev) %>% arrange(start)
-    } else {
-      break
-    }
-    curr_lev = curr_lev+1
+
+  #Get a list of TAD coordinates at the previous level
+
+  coords = cbind(match(called_tads[[curr_lev-1]]$start, as.numeric(colnames(cont_mat))), match(called_tads[[curr_lev-1]]$end-resolution, as.numeric(colnames(cont_mat))))
+
+  #Get tads that are less than the twice the minmium length and thus not seperable
+
+  less_5 = which( (coords[,2]-coords[,1])<min_size*2  )
+
+  if (length(less_5)>0) {
+
+  #Remove TADs which cannot be seperate
+
+  pres_tads = called_tads[[curr_lev-1]][less_5,]
+
+  coords = coords[-less_5, ]
+
+  } else {
+    pres_tads = c()
   }
 
-  #Assign names based on levels, depending on the last curr_lev
-  names(called_tads) = paste0("Level_", seq_len(curr_lev - 1))
+  #Account for the situation where there is only 1 potential sub-tad
+
+  if (is.null(nrow(coords))) {
+    coords = t(as.matrix(coords))
+  }
+
+  tads = apply(coords, 1, function(x) cont_mat[x[1]:x[2], x[1]:x[2]])
+
+
+
+  #Remove sub-tads with too many zeros
+
+  zeros = which(unlist(lapply(tads, function(x) nrow(x)-sum(rowSums(x)==0)))<min_size*2)
+
+  if (length(zeros)>0) {
+  pres_tads = rbind(pres_tads, called_tads[[curr_lev-1]][zeros,])
+  tads[zeros] = NULL
+  }
+
+  #Calculate sub-TADs for each seperable TAD
+
+  sub_tads = lapply(tads, function(x) {
+    .windowedSpec(x, chr =chr, resolution = resolution, qual_filter = qual_filter, z_clust = TRUE, min_size = min_size)
+    })
+
+  #Convert sub-TADs to BED format
+
+  called_tads[[curr_lev]] = bind_rows(sub_tads, pres_tads) %>% mutate(Level = curr_lev) %>% arrange(start)
+
+  curr_lev = curr_lev+1
+
+  }
+
+  #Assign names based on levels
+
+  names(called_tads) = paste0("Level_", seq_len(levels))
   
   if ( !(out_format == "none")) {
     if (out_format %in% c("bedpe", "juicebox")) {
@@ -289,33 +295,51 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 ) {
 
   #Set window sized based on biologically maximum TAD size of 2000000
+  
   window_size = ceiling(window_size)
+
   #Find all regions which aren't completely zero and remove those that are
+
+
   #Get end point of the first window
+
   Group_over = dplyr::bind_rows()
+
   #Initialize first window
+
   start = 1
   end = window_size
+
   #Set parameter for determining end of loop
+
   end_loop = 0
+
   #Test if start+window is larger than the contact matrix and correct end point
+
   if (end+window_size>nrow(cont_mat)) {
     end = nrow(cont_mat)
   }
+
   #Begin sliding window clustering
 
   while (end_loop == 0) {
+
     #Subset matrix based on window size
+
     sub_filt = cont_mat[seq(start,end, 1), seq(start,end, 1)]
+
     #Remove columns and rows with % zeros higher than threshold
     zero_thresh = round(nrow(sub_filt)*(gap_threshold))
     non_gaps_within = which((colSums(sub_filt == 0))<zero_thresh)
+
     #Subset based on gaps
     sub_filt = sub_filt[non_gaps_within, non_gaps_within]
+    
     #If matrix is empty then move window
     if (length(nrow(sub_filt)) == 0) {
       start = end
       end = start+window_size
+      
       #If the new end is same as start end while loop
       if (start == nrow(cont_mat)) {
         end_loop = 1
@@ -329,30 +353,40 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       }
       next
     }
+    
     #Ignore if sub matrix if too small
     if (nrow(sub_filt) < min_size*2) {
       start = end
       end = start+window_size
+    
       #If we reach the end of the matrix then end  
       if (start == nrow(cont_mat)) {
         end_loop = 1
         next
       }
+      
       if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
         end = nrow(cont_mat)
         
       }
       next
     }
+
     # sub_gaps = colSums(sub_filt)>0
     # sub_filt = sub_filt[sub_gaps, sub_gaps]
+
     #Calculate distance matrix for silhouette score
+
     dist_sub = 1/(1+sub_filt)
+
     #Get degree matrix
+
     dr = rowSums(abs(sub_filt))
+
     #Creating the normalized laplacian
+
     Dinvsqrt = diag((1/sqrt(dr)))
-    
+
     P_Part1 = Matrix::crossprod(as.matrix(sub_filt), Dinvsqrt)
     sub_mat = Matrix::crossprod(Dinvsqrt, P_Part1)
 
@@ -361,12 +395,14 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     sub_mat[is.nan(sub_mat)] = 0
 
     #Get first k eigenvectors
+
     Eigen = PRIMME::eigs_sym(sub_mat, NEig = eigenvalues)
 
     eig_vals = Eigen$values
     eig_vecs = Eigen$vectors
 
     #Get order of eigenvalues from largest to smallest
+
     large_small = order(-eig_vals)
 
     eig_vals = eig_vals[large_small]
@@ -376,8 +412,11 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     Group_mem = list()
 
     #Calculate the range of possible clusters
+
     clusters = seq_len(ceiling( (end-start+1)/min_size))
+
     #Normalize the eigenvectors from 0-1
+
     norm_ones = sqrt(dim(sub_mat)[2])
 
     for (i in seq_len(dim(eig_vecs)[2])) {
@@ -391,141 +430,242 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
     k = dim(eig_vecs)[2]
 
     #Project eigenvectors onto a unit circle
+
     eig_vecs = crossprod(diag(diag(tcrossprod(eig_vecs))^(-1/2)), eig_vecs)
 
     #Get distance between points on circle
+
     point_dist = sqrt(rowSums( (eig_vecs-rbind(NA,eig_vecs[-nrow(eig_vecs),]))^2  ))
 
     #Use z-score to select significant gaps
+
     if (z_clust) {
+
       #Get statisticaly significant boundaries
+
       sig_bounds = which(scale(point_dist[-length(point_dist)])>2)
+
       #Remove boundaries within the minimum size
+
       sig_bounds = subset(sig_bounds, sig_bounds>min_size)
+
       #2*min_size is to offset and remove the second occurence
+
       dist_bounds = which(c(min_size*2,diff(sig_bounds))<min_size)
+
       #Remove bounds within the mininum size if they exist
+
       if (length(dist_bounds) > 0) {
         sig_bounds = sig_bounds[-dist_bounds]
       }
+
       #Create TADs using significant boundaries
+
       TAD_start = c(1, sig_bounds+1)
+      
       TAD_end = c(sig_bounds, nrow(sub_filt))
+
       widths = (TAD_end-TAD_start)+1
+
       memberships = unlist(lapply(seq_len(length(TAD_start)), function(x) rep(x,widths[x])))
+
       #Create groups
+
       if (length(sig_bounds) == 0) {
+
         #Create empty set if non-significant
+
         end_group = dplyr::bind_rows()
       } else {
+
         sig_bounds = which(scale(point_dist[-length(point_dist)])>2)
+
         #Remove boundaries within the minimum size
+
         sig_bounds = subset(sig_bounds, sig_bounds>min_size)
+
         #2*min_size is to offset and remove the second occurence
+
         dist_bounds = which(c(min_size*2,diff(sig_bounds))<min_size)
+
         #Assign IDs based on coordinate and groups based on significant boundaries
+
         end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = memberships)
+
         #Compile into bed file
+
         end_group = end_group %>% dplyr::mutate(group_place = Group) %>% dplyr::group_by(group_place) %>% dplyr::mutate(Group = last(ID)) %>% dplyr::ungroup() %>% dplyr::select(ID, Group)
+
       }
+
+
     } else {
+
+
       #Find largest gaps
+
       gap_order = order(-point_dist)
+
       #Remove boundaries occuring before minimum size at the very beginning of window
+
       #gap_order = gap_order[-which(gap_order<min_size)]
+
       #Initialize silhouette score
+
       sil_score = c()
 
+
       for (cluster in clusters) {
+
         #Loop through first k gaps and remove repeating boundaries
+
         #Set intial cutpoints to the number of clusters
+
         k = 1
         partition_found = 0
         first_run = TRUE
         cutpoints = c()
+
         #Loop through cluster numbers by iteratively adding new candidate boundaries and testing
+
         while(partition_found == 0) {
+
           #Get candidate gaps
+
           new_gap = gap_order[k]
+
           cutpoints = c(cutpoints, new_gap)
+
           #Identify gaps which are closer together than the minimum TAD size
+
           diff_points = which( abs(new_gap-cutpoints[-length(cutpoints)]) <= min_size)
+
           #If a point exists that is too close to another, remove it
+
           if (length(diff_points)>0) {
             cutpoints = cutpoints[-length(cutpoints)]
           }
+
           #If not these are final clusters
+
           if (length(cutpoints) == cluster) {
             partition_found = 1
           } else {
             k = k+1
           }
         }
+
         #If the new candidate cluster is an NA value, ignore
+
         if (any(is.na(cutpoints))) {
           next
         }
+
         #Order
+
         cutpoints = cutpoints[order(cutpoints)]
+
         #Combine cutpoints with start and end of window
+
         cutpoints = c(1, cutpoints, length(non_gaps_within)+1)
+
         #Find size of each cluster (TAD)
+
         group_size = diff(cutpoints)
+
         #Assign locations of the window memberships based on cutpoints
+
         memberships = c()
         for (i in seq_len(length(group_size))) {
           memberships = c(memberships, rep(i,times = group_size[i]))
         }
+
         #Get silhouette score for current number of clusters (TADs)
+
         sil = summary(cluster::silhouette(memberships,dist_sub))
+
         #Save silhouette scores for each configuration in vector
+
         sil_score = c(sil_score, sil$si.summary[4])
+
         #Save memberships in list
+
         Group_mem[[cluster]] = memberships
+
       }
 
+
+
       #Pull out the cutpoints which maximize silhouette score
+
       end_group = Group_mem[[which(diff(sil_score)<0)[1]]]
+
       #Put coordinates and group IDs into data frame
-      if (length(end_group) == 0 | is.null(end_group)) {
+
+      if (length(end_group) == 0) {
         end_group = dplyr::bind_rows()
       } else {
+
       end_group = data.frame(ID = as.numeric(colnames(sub_filt)), Group = end_group)
+
       #Convert IDs to coordinates of endpoint to avoid overlaps
+
       end_group = end_group %>%dplyr::mutate(group_place = Group) %>%dplyr::group_by(group_place) %>%dplyr::mutate(Group = max(ID)) %>% ungroup() %>% dplyr::select(ID, Group)
       }
     }
 
     #End while loop if window reaches end of contact matrix
+
     if (end == nrow(cont_mat)) {
       Group_over = dplyr::bind_rows(Group_over, end_group)
       end_loop = 1
-      # Proceed only if end_group has rows (it may be 0 x 0 tibble)
-    } else if (nrow(end_group) > 0) {
+    } else {
+
       #Remove the last group (To account for overlap across windows) and set new start to start of group
+
+      if (nrow(end_group)!=0) {
       end_IDs = which(end_group$Group == last(end_group$Group))
+      } else {
+        end_IDs = 1:window_size
+      }
+      
       start = end-length(end_IDs)+1
+
       #Account for cases when final TAD can't be removed
+
       if (length(start) == 0 ) {
         start = end
       }
+
       #Set new window end
+
+      if (nrow(end_group != 0)) {
       end = start+window_size
+      } else {
+      end=start+window_size*2
+}
       #Remove final group to avoid repeating
+
       end_group = end_group[-end_IDs, ]
+
       #Combine TAD coordinates into single bed file
+
       Group_over = dplyr::bind_rows(Group_over, end_group)
+
       #Set end point to end of contact matrix if window is larger than end of matrix
+
       if ( (end + (2000000/resolution)) > nrow(cont_mat) ) {
         end = nrow(cont_mat)
+
       }
-    } else {
-      end_loop = 1
     }
   }
 
+
   #Organize final results based on options selected
+
   if (z_clust) {
+
     if (nrow(Group_over) > 0) {
       bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>%dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%
         dplyr::filter((end-start)/resolution >= min_size) %>%dplyr::arrange(start)
@@ -533,17 +673,26 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
       bed = Group_over
     }
   } else {
+
     if (qual_filter) {
+
       #Calculate an overall distance matrix for calculating silhouette score for filtering
+
       #Get range of values in the contact matrix
+
       fin_range = match(Group_over$ID,colnames(cont_mat))
+
       over_dist_mat = 1/(1+cont_mat[fin_range, fin_range])
 
+
       #Calculate group-wise silhouette
+
       sil = cluster::silhouette(Group_over$Group, over_dist_mat)
+
       ave_sil = summary(sil)$clus.avg.widths
 
       #Subset results based on silhouette score depending on qual_filter option
+
       bed = Group_over %>% dplyr::group_by(Group) %>% dplyr::summarise(start = min(ID), end = max(ID) + resolution) %>% dplyr::mutate(chr = chr) %>% dplyr::select(chr, start, end) %>%
         dplyr::mutate(Sil_Score = ave_sil) %>% dplyr::filter( ((end-start)/resolution >= min_size) & Sil_Score > .15)  %>%dplyr::arrange(start)
     } else {
@@ -553,3 +702,4 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
    
   return(bed)
 }
+

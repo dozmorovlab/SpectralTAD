@@ -1,7 +1,5 @@
-Changes in version 1.15.2 (2023-02-01)
-+ Major code update due to breaking changes in the dependencies. Current results
-  are a subset of results obtained prior to it.
-Changes in version 1.15.1 (2023-01-07)
+Changes in version 1.15.3 (2023-03-07)
++ SpectralTAD fixed by Kellen: "There was something in the code designed to expand the window if no TADs were detected but it was not working properly. No idea why it just started now."
 + Change example for SpectralTAD_Par(mat_list, chr= chr, labels = labels, cores = 2)
 + Update authors, make DESCRIPTION current
 Changes in version 1.11.0 (2022-04-21)
