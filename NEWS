@@ -1,3 +1,5 @@
+Changes in version 1.16.1 (2023-07-04)
++ Adjust installation url
 Changes in version 1.15.3 (2023-03-07)
 + SpectralTAD fixed by Kellen: "There was something in the code designed to expand the window if no TADs were detected but it was not working properly. No idea why it just started now."
 + Change example for SpectralTAD_Par(mat_list, chr= chr, labels = labels, cores = 2)

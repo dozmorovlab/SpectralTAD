@@ -51,7 +51,7 @@ The package is based around the windowed spectral clustering algorithm, introduc
 # if (!requireNamespace("BiocManager", quietly=TRUE))
 #     install.packages("BiocManager")
 # BiocManager::install("SpectralTAD")
-devtools::install_github("cresswellkg/SpectralTAD")
+devtools::install_github("dozmorovlab/SpectralTAD")
 library(SpectralTAD)
 ```
 
