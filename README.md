@@ -1,9 +1,9 @@
 # SpectralTAD
 <!-- badges: start -->
   [![BioC status](http://www.bioconductor.org/shields/build/release/bioc/SpectralTAD.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/SpectralTAD)
-  [![Build Status](https://travis-ci.org/cresswellkg/SpectralTAD.svg?branch=master)](https://travis-ci.org/cresswellkg/SpectralTAD)
+  [![Build Status](https://travis-ci.org/dozmorovlab/SpectralTAD.svg?branch=master)](https://travis-ci.org/dozmorovlab/SpectralTAD)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![Codecov test coverage](https://codecov.io/gh/cresswellkg/SpectralTAD/branch/master/graph/badge.svg)](https://codecov.io/gh/cresswellkg/SpectralTAD?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/dozmorovlab/SpectralTAD/branch/master/graph/badge.svg)](https://codecov.io/gh/dozmorovlab/SpectralTAD?branch=master)
 <!-- badges: end -->
 
 Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. “[SpectralTAD: An R Package for Defining a Hierarchy of Topologically Associated Domains Using Spectral Clustering](https://doi.org/10.1186/s12859-020-03652-w).” BMC Bioinformatics 21, no. 1 (December 2020): 319.
@@ -41,7 +41,7 @@ BiocManager::install('BiocParallel')
 The latest version of `SpectralTAD` can be directly installed from Github:
 
 ```
-devtools::install_github('cresswellkg/SpectralTAD', build_vignettes = TRUE)
+devtools::install_github('dozmorovlab/SpectralTAD', build_vignettes = TRUE)
 library(SpectralTAD)
 ```
 
@@ -118,8 +118,8 @@ Cresswell, Kellen G., John C. Stansfield, and Mikhail G. Dozmorov. "SpectralTAD:
 
 Suggestions for new features and bug reports are welcome. Please, create a new 
 issue for any of these or contact the author directly: 
-@cresswellkg (cresswellkg[at]vcu[dot]edu)
+@dozmorovlab (dozmorovlab[at]vcu[dot]edu)
 
 ## Contributors
 
-Authors: @cresswellkg (cresswellkg[at]vcu[dot]edu) & @mdozmorov (mikhail.dozmorov[at]vcuhealth[dot]org)
+Authors: @dozmorovlab (dozmorovlab[at]vcu[dot]edu) & @mdozmorov (mikhail.dozmorov[at]vcuhealth[dot]org)
