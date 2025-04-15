@@ -1,6 +1,6 @@
 Package: SpectralTAD
 Title: SpectralTAD: Hierarchical TAD detection using spectral clustering
-Version: 1.24.0
+Version: 1.25.0
 Authors@R: c(
     person(given = "Mikhail",
            family = "Dozmorov",
