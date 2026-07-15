@@ -27,7 +27,6 @@ Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: 
     dplyr,
-    PRIMME,
     cluster,
     Matrix,
     parallel,
@@ -44,7 +43,8 @@ Suggests:
     rmarkdown,
     microbenchmark,
     testthat,
-    covr
+    covr,
+    PRIMME
 Depends: R (>= 3.6)
 VignetteBuilder: knitr
 biocViews: Software, HiC, Sequencing, FeatureExtraction, Clustering

@@ -396,7 +396,7 @@ SpectralTAD = function(cont_mat, chr, levels = 1, qual_filter = FALSE,
 
     #Get first k eigenvectors
 
-    Eigen = PRIMME::eigs_sym(sub_mat, NEig = eigenvalues)
+    Eigen = get_eigs(sub_mat, NEig = eigenvalues)
 
     eig_vals = Eigen$values
     eig_vecs = Eigen$vectors
