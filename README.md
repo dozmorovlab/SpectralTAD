@@ -26,7 +26,7 @@ an n x (n+3), or a sparse 3-column matrix (see vignette (`browseVignettes("Spect
 If necessary, install the dependencies:
 
 ```
-install.packages(c('dplyr', 'PRIMME', 'cluster',
+install.packages(c('dplyr', 'cluster',
     'Matrix',
     'parallel',
     'magrittr',
